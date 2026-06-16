@@ -207,12 +207,17 @@ async function extractCurrentClientsPage(page) {
       return idx >= 0 ? idx : fallbackIndex;
     };
 
-    const nameIdx = headerIndex(h => h.includes('client') || h.includes('customer') || h.includes('name'), 0);
-    const statusIdx = headerIndex(h => h.includes('status') || h.includes('live'), 1);
-    const prodCurrentIdx = headerIndex(h => h.includes('prod') && h.includes('current') && h.includes('build'), 2);
-    const prodFutureIdx = headerIndex(h => h.includes('prod') && h.includes('future') && h.includes('build'), 3);
-    const testCurrentIdx = headerIndex(h => h.includes('test') && h.includes('current') && h.includes('build'), 4);
-    const testFutureIdx = headerIndex(h => h.includes('test') && h.includes('future') && h.includes('build'), 5);
+    // Column mapping for Clients table:
+    // 0: Customer name
+    // 1: Parent/Account (optional)
+    // 2: Prod Current Build
+    // 3: Prod Future Build / Deployment Type (On-Prem, Cloud)
+    // 4: Status (Live, Pre-Implementation, Terminated)
+    const nameIdx = 0;
+    const prodCurrentIdx = 2;
+    const prodFutureIdx = 3;
+    const statusIdx = 4;
+    // Note: Test builds are not in this table; they're shown in rawHtml or extracted differently
 
     const rows = Array.from(table.querySelectorAll('tbody tr'));
 
@@ -234,8 +239,9 @@ async function extractCurrentClientsPage(page) {
           status: cellText(statusIdx),
           prodCurrentBuild: cellText(prodCurrentIdx),
           prodFutureBuild: cellText(prodFutureIdx),
-          testCurrentBuild: cellText(testCurrentIdx),
-          testFutureBuild: cellText(testFutureIdx),
+          prodDeploymentType: cellText(prodFutureIdx),
+          testCurrentBuild: '',
+          testFutureBuild: '',
           rawHtml: row.innerHTML,
         };
       })
