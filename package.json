@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node src/server.js",
     "scrape": "node src/scraper.js",
-    "dev": "node src/server.js"
+    "dev": "node src/server.js",
+    "check": "node scripts/checks.js",
+    "check:syntax": "node --check src/server.js && node --check src/scraper.js"
   },
   "dependencies": {
     "express": "^4.18.2",
