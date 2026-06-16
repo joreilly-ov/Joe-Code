@@ -130,13 +130,7 @@ async function extractData(page) {
     const result = await extractCurrentClientsPage(page);
 
     for (const customer of result.customers) {
-      const key = [
-        customer.name,
-        customer.prodCurrentBuild,
-        customer.prodFutureBuild,
-        customer.testCurrentBuild,
-        customer.testFutureBuild,
-      ].join('|');
+      const key = [customer.name, customer.prodCurrentBuild, customer.deliveryType].join('|');
 
       if (!seen.has(key)) {
         seen.add(key);
@@ -176,7 +170,52 @@ async function extractData(page) {
     }
   }
 
+  // Fetch test builds from each client's detail page
+  const baseUrl = new URL(page.url()).origin;
+  console.log(`Fetching test builds for ${allCustomers.length} clients...`);
+  for (let i = 0; i < allCustomers.length; i++) {
+    const customer = allCustomers[i];
+    if (customer.detailUrl) {
+      customer.testCurrentBuild = await extractTestBuild(page, `${baseUrl}${customer.detailUrl}`);
+      if ((i + 1) % 10 === 0) console.log(`  Test builds: ${i + 1}/${allCustomers.length}`);
+    }
+  }
+  console.log('Test build fetch complete.');
+
   return allCustomers;
+}
+
+async function extractTestBuild(page, detailUrl) {
+  try {
+    await page.goto(detailUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
+    return await page.evaluate(() => {
+      // Find a label containing "TEST Version" and return the adjacent value
+      const candidates = Array.from(document.querySelectorAll('th, dt, td, label, strong, b, h6, .col-form-label'));
+      for (const el of candidates) {
+        if (/test.*version/i.test(el.textContent) && el.textContent.trim().length < 60) {
+          // Try next sibling td/dd first
+          const next = el.nextElementSibling;
+          if (next) {
+            const val = (next.textContent || '').trim();
+            if (val) return val;
+          }
+          // Try parent row's last td
+          const row = el.closest('tr');
+          if (row) {
+            const cells = Array.from(row.querySelectorAll('td'));
+            const last = cells[cells.length - 1];
+            if (last && last !== el) {
+              const val = (last.textContent || '').trim();
+              if (val) return val;
+            }
+          }
+        }
+      }
+      return '';
+    });
+  } catch {
+    return '';
+  }
 }
 
 async function extractCurrentClientsPage(page) {
@@ -198,26 +237,16 @@ async function extractCurrentClientsPage(page) {
       };
     }
 
-    const headers = Array.from(table.querySelectorAll('thead th')).map(th =>
-      (th.textContent || '').trim().toLowerCase()
-    );
-
-    const headerIndex = (matcher, fallbackIndex) => {
-      const idx = headers.findIndex(matcher);
-      return idx >= 0 ? idx : fallbackIndex;
-    };
-
     // Column mapping for Clients table:
     // 0: Customer name
-    // 1: Parent/Account (optional)
+    // 1: Parent/Account (optional, may be empty)
     // 2: Prod Current Build
-    // 3: Prod Future Build / Deployment Type (On-Prem, Cloud)
-    // 4: Status (Live, Pre-Implementation, Terminated)
+    // 3: Delivery Type (On-Prem / Cloud)
+    // 4: Status badge (Live / Pre-Implementation / Terminated)
+    // 5: Actions (ignored)
     const nameIdx = 0;
     const prodCurrentIdx = 2;
-    const prodFutureIdx = 3;
-    const statusIdx = 4;
-    // Note: Test builds are not in this table; they're shown in rawHtml or extracted differently
+    const deliveryTypeIdx = 3;
 
     const rows = Array.from(table.querySelectorAll('tbody tr'));
 
@@ -234,14 +263,21 @@ async function extractCurrentClientsPage(page) {
           return null;
         }
 
+        // Status is in the badge span (Live / Pre-Implementation / Terminated)
+        const badgeSpan = row.querySelector('span.badge');
+        const status = (badgeSpan?.textContent || '').trim();
+
+        // Detail URL for fetching test build later
+        const detailAnchor = row.querySelector('a[href*="/Clients/Details/"]');
+        const detailUrl = detailAnchor ? detailAnchor.getAttribute('href').split('?')[0] : '';
+
         return {
           name,
-          status: cellText(statusIdx),
+          status,
+          deliveryType: cellText(deliveryTypeIdx),
           prodCurrentBuild: cellText(prodCurrentIdx),
-          prodFutureBuild: cellText(prodFutureIdx),
-          prodDeploymentType: cellText(prodFutureIdx),
           testCurrentBuild: '',
-          testFutureBuild: '',
+          detailUrl,
           rawHtml: row.innerHTML,
         };
       })

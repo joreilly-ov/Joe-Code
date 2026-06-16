@@ -230,7 +230,8 @@
           <tr>
             <th>Customer</th>
             <th><span class="env-label env-prod">Prod</span> Current Build</th>
-            <th>Deployment Type</th>
+            <th><span class="env-label env-test">Test</span> Current Build</th>
+            <th>Delivery</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -277,20 +278,25 @@
   function renderTable(customers) {
     const tbody = document.getElementById('builds-body');
     if (!customers.length) {
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#718096">No customers found.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:#718096">No customers found.</td></tr>`;
       return;
     }
     tbody.innerHTML = customers.map(c => {
-      const statusColor = (c.status || '').toLowerCase().includes('live') ? '#276749' : 
-                         (c.status || '').toLowerCase().includes('pre') ? '#975a16' : '#2d3748';
-      const statusBg = (c.status || '').toLowerCase().includes('live') ? '#c6f6d5' : 
-                      (c.status || '').toLowerCase().includes('pre') ? '#fefcbf' : '#e2e8f0';
+      const status = c.status || '';
+      const statusLower = status.toLowerCase();
+      const statusColor = statusLower.includes('live') ? '#276749' :
+                          statusLower.includes('pre') ? '#975a16' :
+                          statusLower.includes('terminated') ? '#9b2c2c' : '#2d3748';
+      const statusBg = statusLower.includes('live') ? '#c6f6d5' :
+                       statusLower.includes('pre') ? '#fefcbf' :
+                       statusLower.includes('terminated') ? '#fed7d7' : '#e2e8f0';
       return `
       <tr>
         <td class="customer-name">${esc(c.name)}</td>
         <td><span class="build-chip">${esc(c.prodCurrentBuild) || '–'}</span></td>
-        <td><span class="build-chip">${esc(c.prodDeploymentType || c.prodFutureBuild) || '–'}</span></td>
-        <td><span class="build-chip" style="background-color: ${statusBg}; color: ${statusColor};">${esc(c.status) || '–'}</span></td>
+        <td><span class="build-chip">${esc(c.testCurrentBuild) || '–'}</span></td>
+        <td><span class="build-chip">${esc(c.deliveryType) || '–'}</span></td>
+        <td><span class="build-chip" style="background-color: ${statusBg}; color: ${statusColor};">${esc(status) || '–'}</span></td>
       </tr>
     `}).join('');
   }
