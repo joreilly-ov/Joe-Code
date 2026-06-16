@@ -190,6 +190,15 @@
     }
     #empty-state h2 { font-size: 1.2rem; margin-bottom: 8px; }
     #empty-state p  { font-size: 0.9rem; }
+    .country-group { margin-top: 32px; }
+    .group-heading {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #16213e;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+    }
   </style>
 </head>
 <body>
@@ -224,21 +233,39 @@
         </label>
       </div>
     </div>
-    <div class="table-wrap">
-      <table id="builds-table">
-        <thead>
-          <tr>
+    </div>
+
+    <div id="group-usa" class="country-group">
+      <h2 class="group-heading">🇺🇸 USA</h2>
+      <div class="table-wrap">
+        <table class="builds-table">
+          <thead><tr>
             <th>Customer</th>
             <th><span class="env-label env-prod">Prod</span> Current Build</th>
             <th><span class="env-label env-test">Test</span> Current Build</th>
             <th>Delivery</th>
             <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="builds-body"></tbody>
-      </table>
+          </tr></thead>
+          <tbody id="tbody-usa"></tbody>
+        </table>
+      </div>
     </div>
-  </div>
+
+    <div id="group-row" class="country-group">
+      <h2 class="group-heading">🌏 Rest of World</h2>
+      <div class="table-wrap">
+        <table class="builds-table">
+          <thead><tr>
+            <th>Customer</th>
+            <th><span class="env-label env-prod">Prod</span> Current Build</th>
+            <th><span class="env-label env-test">Test</span> Current Build</th>
+            <th>Delivery</th>
+            <th>Status</th>
+          </tr></thead>
+          <tbody id="tbody-row"></tbody>
+        </table>
+      </div>
+    </div>
 </div>
 
 <script>
@@ -276,31 +303,29 @@
   }
 
   function renderTable(customers) {
-    const tbody = document.getElementById('builds-body');
-    if (!customers.length) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:#718096">No customers found.</td></tr>`;
-      return;
-    }
-    tbody.innerHTML = customers.map(c => {
+    function rowHtml(c) {
       const status = c.status || '';
-      const statusLower = status.toLowerCase();
-      const statusColor = statusLower.includes('live') ? '#276749' :
-                          statusLower.includes('pre') ? '#975a16' :
-                          statusLower.includes('terminated') ? '#9b2c2c' : '#2d3748';
-      const statusBg = statusLower.includes('live') ? '#c6f6d5' :
-                       statusLower.includes('pre') ? '#fefcbf' :
-                       statusLower.includes('terminated') ? '#fed7d7' : '#e2e8f0';
-      return `
-      <tr>
-        <td class="customer-name">${esc(c.name)}</td>
-        <td><span class="build-chip">${esc(c.prodCurrentBuild) || '–'}</span></td>
-        <td><span class="build-chip">${esc(c.testCurrentBuild) || '–'}</span></td>
-        <td><span class="build-chip">${esc(c.deliveryType) || '–'}</span></td>
-        <td><span class="build-chip" style="background-color: ${statusBg}; color: ${statusColor};">${esc(status) || '–'}</span></td>
-      </tr>
-    `}).join('');
+      const s = status.toLowerCase();
+      const sc = s.includes('live') ? '#276749' : s.includes('pre') ? '#975a16' : s.includes('terminated') ? '#9b2c2c' : '#2d3748';
+      const sb = s.includes('live') ? '#c6f6d5' : s.includes('pre') ? '#fefcbf' : s.includes('terminated') ? '#fed7d7' : '#e2e8f0';
+      return '<tr>' +
+        '<td class="customer-name">' + esc(c.name) + '</td>' +
+        '<td><span class="build-chip">' + (esc(c.prodCurrentBuild) || '\u2013') + '</span></td>' +
+        '<td><span class="build-chip">' + (esc(c.testCurrentBuild) || '\u2013') + '</span></td>' +
+        '<td><span class="build-chip">' + (esc(c.deliveryType) || '\u2013') + '</span></td>' +
+        '<td><span class="build-chip" style="background-color:' + sb + ';color:' + sc + ';">'' + (esc(status) || '\u2013') + '</span></td>' +
+        '</tr>';
+    }
+    function makeRows(list) {
+      return list.length ? list.map(rowHtml).join('') : '<tr><td colspan="5" style="text-align:center;padding:20px;color:#718096">No customers.</td></tr>';
+    }
+    const usa = customers.filter(c => /united states|^usa$/i.test(c.country || ''));
+    const row = customers.filter(c => !usa.includes(c));
+    document.getElementById('tbody-usa').innerHTML = makeRows(usa);
+    document.getElementById('tbody-row').innerHTML = makeRows(row);
+    document.getElementById('group-usa').style.display = usa.length ? '' : 'none';
+    document.getElementById('group-row').style.display = row.length ? '' : 'none';
   }
-
   function applyFilters() {
     const searchQuery = document.getElementById('search-bar').value.toLowerCase();
     const statusFilter = document.querySelector('input[name="status-filter"]:checked').value;
