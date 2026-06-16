@@ -313,13 +313,13 @@
         '<td><span class="build-chip">' + (esc(c.prodCurrentBuild) || '\u2013') + '</span></td>' +
         '<td><span class="build-chip">' + (esc(c.testCurrentBuild) || '\u2013') + '</span></td>' +
         '<td><span class="build-chip">' + (esc(c.deliveryType) || '\u2013') + '</span></td>' +
-        '<td><span class="build-chip" style="background-color:' + sb + ';color:' + sc + ';">'' + (esc(status) || '\u2013') + '</span></td>' +
+        '<td><span class="build-chip" style="background-color:' + sb + ';color:' + sc + ';">' + (esc(status) || '\u2013') + '</span></td>' +
         '</tr>';
     }
     function makeRows(list) {
       return list.length ? list.map(rowHtml).join('') : '<tr><td colspan="5" style="text-align:center;padding:20px;color:#718096">No customers.</td></tr>';
     }
-    const usa = customers.filter(c => /united states|^usa$/i.test(c.country || ''));
+    const usa = customers.filter(c => /united states|united states of america|^u\.?s\.?a\.?$|^u\.?s\.?$/i.test((c.country || '').trim()));
     const row = customers.filter(c => !usa.includes(c));
     document.getElementById('tbody-usa').innerHTML = makeRows(usa);
     document.getElementById('tbody-row').innerHTML = makeRows(row);

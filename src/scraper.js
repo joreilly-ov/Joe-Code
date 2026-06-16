@@ -173,6 +173,12 @@ async function extractDetailPageData(page, detailUrl) {
         for (const el of candidates) {
           const text = el.textContent.trim();
           if (regex.test(text) && text.length < 80) {
+            // Handle inline forms like "Country: USA"
+            const inlineMatch = text.match(/^[^:]+:\s*(.+)$/);
+            if (inlineMatch && inlineMatch[1] && inlineMatch[1].length < 60) {
+              return inlineMatch[1].trim();
+            }
+
             const next = el.nextElementSibling;
             if (next) {
               const val = (next.textContent || "").trim();
@@ -197,9 +203,19 @@ async function extractDetailPageData(page, detailUrl) {
         return "";
       }
 
+      function findCountry() {
+        const byLabel = findLabelledValue(/^country\s*:??$/i) || findLabelledValue(/country/i);
+        if (byLabel) return byLabel;
+
+        // Last-resort scan of whole page text.
+        const pageText = (document.body?.innerText || "").replace(/\s+/g, " ");
+        const m = pageText.match(/country\s*:?\s*([A-Za-z .'-]{2,40})/i);
+        return m ? m[1].trim() : "";
+      }
+
       return {
         testBuild: findLabelledValue(/test\s+version/i),
-        country: findLabelledValue(/^country$/i),
+        country: findCountry(),
       };
     });
   } catch {
