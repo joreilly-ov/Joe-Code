@@ -244,13 +244,13 @@ async function extractCurrentClientsPage(page) {
       const cells = Array.from(row.querySelectorAll("td"));
       const cellText = index => cells[index]?.innerText?.trim() || "";
 
-      const name = cellText(nameIdx) || (row.querySelector("a[href*=/Clients/]")?.textContent || "").trim();
+      const name = cellText(nameIdx) || (row.querySelector("a[href*=\"/Clients/\"]")?.textContent || "").trim();
       if (!name || /no data available/i.test(name)) return null;
 
       const badgeSpan = row.querySelector("span.badge");
       const status = (badgeSpan?.textContent || "").trim();
 
-      const detailAnchor = row.querySelector("a[href*=/Clients/Details/]");
+      const detailAnchor = row.querySelector("a[href*=\"/Clients/Details/\"]");
       const detailUrl = detailAnchor ? detailAnchor.getAttribute("href").split("?")[0] : "";
 
       return {
