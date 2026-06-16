@@ -122,7 +122,65 @@ async function extractData(page) {
   await navigateToClientsPage(page);
   await page.waitForLoadState('networkidle');
 
-  const result = await page.evaluate(() => {
+  const allCustomers = [];
+  const seen = new Set();
+  const maxPages = 50;
+
+  for (let i = 0; i < maxPages; i++) {
+    const result = await extractCurrentClientsPage(page);
+
+    for (const customer of result.customers) {
+      const key = [
+        customer.name,
+        customer.prodCurrentBuild,
+        customer.prodFutureBuild,
+        customer.testCurrentBuild,
+        customer.testFutureBuild,
+      ].join('|');
+
+      if (!seen.has(key)) {
+        seen.add(key);
+        allCustomers.push(customer);
+      }
+    }
+
+    console.log(
+      `Clients page ${result.currentPage || i + 1}: rows=${result.rowCount}, extracted=${result.customerCount}, total=${allCustomers.length}`
+    );
+
+    if (!result.hasNext) {
+      break;
+    }
+
+    const signatureBefore = `${result.currentPage || i + 1}|${result.firstRow || ''}`;
+    const moved = await clickNextClientsPage(page);
+
+    if (!moved) {
+      break;
+    }
+
+    try {
+      await page.waitForFunction(
+        previousSignature => {
+          const currentPageEl = document.querySelector('.dataTables_paginate .paginate_button.current, .pagination .active');
+          const currentPage = (currentPageEl?.textContent || '').trim();
+          const firstRow = (document.querySelector('table tbody tr td')?.textContent || '').trim();
+          return `${currentPage}|${firstRow}` !== previousSignature;
+        },
+        signatureBefore,
+        { timeout: 10000 }
+      );
+    } catch {
+      // Some table implementations update in-place without reliable page markers.
+      await page.waitForLoadState('networkidle');
+    }
+  }
+
+  return allCustomers;
+}
+
+async function extractCurrentClientsPage(page) {
+  return page.evaluate(() => {
     const table =
       document.querySelector('table.table') ||
       document.querySelector('table[data-table]') ||
@@ -132,6 +190,9 @@ async function extractData(page) {
       return {
         rowCount: 0,
         customerCount: 0,
+        currentPage: null,
+        firstRow: '',
+        hasNext: false,
         title: document.title,
         customers: [],
       };
@@ -147,10 +208,11 @@ async function extractData(page) {
     };
 
     const nameIdx = headerIndex(h => h.includes('client') || h.includes('customer') || h.includes('name'), 0);
-    const prodCurrentIdx = headerIndex(h => h.includes('prod') && h.includes('current') && h.includes('build'), 1);
-    const prodFutureIdx = headerIndex(h => h.includes('prod') && h.includes('future') && h.includes('build'), 2);
-    const testCurrentIdx = headerIndex(h => h.includes('test') && h.includes('current') && h.includes('build'), 3);
-    const testFutureIdx = headerIndex(h => h.includes('test') && h.includes('future') && h.includes('build'), 4);
+    const statusIdx = headerIndex(h => h.includes('status') || h.includes('live'), 1);
+    const prodCurrentIdx = headerIndex(h => h.includes('prod') && h.includes('current') && h.includes('build'), 2);
+    const prodFutureIdx = headerIndex(h => h.includes('prod') && h.includes('future') && h.includes('build'), 3);
+    const testCurrentIdx = headerIndex(h => h.includes('test') && h.includes('current') && h.includes('build'), 4);
+    const testFutureIdx = headerIndex(h => h.includes('test') && h.includes('future') && h.includes('build'), 5);
 
     const rows = Array.from(table.querySelectorAll('tbody tr'));
 
@@ -169,6 +231,7 @@ async function extractData(page) {
 
         return {
           name,
+          status: cellText(statusIdx),
           prodCurrentBuild: cellText(prodCurrentIdx),
           prodFutureBuild: cellText(prodFutureIdx),
           testCurrentBuild: cellText(testCurrentIdx),
@@ -178,19 +241,58 @@ async function extractData(page) {
       })
       .filter(Boolean);
 
+    const currentPageEl = document.querySelector('.dataTables_paginate .paginate_button.current, .pagination .active');
+    const nextEl =
+      document.querySelector('.dataTables_paginate .paginate_button.next') ||
+      document.querySelector('#DataTables_Table_0_next') ||
+      document.querySelector('.pagination .next') ||
+      document.querySelector('[aria-label="Next"]');
+
+    const nextClasses = (nextEl?.className || '').toLowerCase();
+    const nextAriaDisabled = (nextEl?.getAttribute('aria-disabled') || '').toLowerCase();
+    const hasNext =
+      Boolean(nextEl) &&
+      !nextClasses.includes('disabled') &&
+      !nextClasses.includes('paginate_button_disabled') &&
+      nextAriaDisabled !== 'true';
+
     return {
       rowCount: rows.length,
       customerCount: customers.length,
+      currentPage: (currentPageEl?.textContent || '').trim() || null,
+      firstRow: (rows[0]?.querySelector('td')?.textContent || '').trim(),
+      hasNext,
       title: document.title,
       customers,
     };
   });
+}
 
-  console.log(`Page title: ${result.title}`);
-  console.log(`Candidate rows found: ${result.rowCount}`);
-  console.log(`Customers extracted: ${result.customerCount}`);
+async function clickNextClientsPage(page) {
+  return page.evaluate(() => {
+    const nextEl =
+      document.querySelector('.dataTables_paginate .paginate_button.next') ||
+      document.querySelector('#DataTables_Table_0_next') ||
+      document.querySelector('.pagination .next a, .pagination .next') ||
+      document.querySelector('[aria-label="Next"]');
 
-  return result.customers;
+    if (!nextEl) {
+      return false;
+    }
+
+    const classes = (nextEl.className || '').toLowerCase();
+    const ariaDisabled = (nextEl.getAttribute('aria-disabled') || '').toLowerCase();
+    if (
+      classes.includes('disabled') ||
+      classes.includes('paginate_button_disabled') ||
+      ariaDisabled === 'true'
+    ) {
+      return false;
+    }
+
+    nextEl.click();
+    return true;
+  });
 }
 
 async function navigateToClientsPage(page) {
