@@ -188,26 +188,31 @@ async function extractData(page) {
 async function extractTestBuild(page, detailUrl) {
   try {
     await page.goto(detailUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
+    await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
+
     return await page.evaluate(() => {
-      // Find a label containing "TEST Version" and return the adjacent value
-      const candidates = Array.from(document.querySelectorAll('th, dt, td, label, strong, b, h6, .col-form-label'));
+      const candidates = Array.from(document.querySelectorAll('th, dt, td, label, strong, b, h6, .col-form-label, p, span, div'));
       for (const el of candidates) {
-        if (/test.*version/i.test(el.textContent) && el.textContent.trim().length < 60) {
-          // Try next sibling td/dd first
+        const text = el.textContent.trim();
+        if (/test\s+version/i.test(text) && text.length < 80) {
           const next = el.nextElementSibling;
           if (next) {
             const val = (next.textContent || '').trim();
-            if (val) return val;
+            if (val && val.length < 60) return val;
           }
-          // Try parent row's last td
           const row = el.closest('tr');
           if (row) {
-            const cells = Array.from(row.querySelectorAll('td'));
-            const last = cells[cells.length - 1];
-            if (last && last !== el) {
-              const val = (last.textContent || '').trim();
-              if (val) return val;
+            const cells = Array.from(row.querySelectorAll('td, th'));
+            const idx = cells.indexOf(el);
+            if (idx >= 0 && cells[idx + 1]) {
+              const val = (cells[idx + 1].textContent || '').trim();
+              if (val && val.length < 60) return val;
             }
+          }
+          const group = el.closest('.row, .form-group, .mb-3, dl, li');
+          if (group) {
+            const val = (group.textContent || '').replace(text, '').trim();
+            if (val && val.length < 60) return val;
           }
         }
       }
