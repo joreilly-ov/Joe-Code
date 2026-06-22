@@ -81,18 +81,27 @@ async function waitForLoginWithRedirect(page) {
   console.log("Waiting for OAuth redirect and login completion...");
   
   try {
-    // Wait for the OAuth callback URL pattern
-    await page.waitForURL(
-      url => url.includes("ovcd.oneviewhealthcare.com"),
-      { timeout: timeoutMs }
+    // Poll for URL change from login.microsoftonline.com to ovcd.oneviewhealthcare.com
+    const redirectDetected = await page.waitForFunction(
+      () => {
+        const url = window.location.href.toLowerCase();
+        return url.includes("ovcd.oneviewhealthcare.com");
+      },
+      { timeout: timeoutMs, polling: 1000 }
     );
     
-    console.log(`✓ OAuth redirect detected. Final URL: ${page.url()}`);
+    console.log(`✓ OAuth redirect detected at: ${page.url()}`);
     
     // Wait for the page to fully load after redirect
-    await page.waitForLoadState("networkidle", { timeout: 30000 }).catch(() => {
-      console.log("Page interactive (network may still be loading)...");
-    });
+    try {
+      await page.waitForLoadState("networkidle", { timeout: 30000 });
+      console.log("✓ Page loaded");
+    } catch {
+      console.log("✓ Page interactive (network may still be loading)...");
+    }
+    
+    // Wait a bit for any post-redirect auth cookies/state to settle
+    await page.waitForTimeout(2000);
     
     // Verify we're on OVCD and login is complete
     const isLoggedIn = await page.evaluate(() => {
@@ -111,14 +120,15 @@ async function waitForLoginWithRedirect(page) {
       throw new Error("OAuth redirect completed but login form still present");
     }
     
-    console.log(`✓ Login verified (${Math.round((Date.now() - startTime) / 1000)}s elapsed)`);
+    const elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
+    console.log(`✓ Login verified (${elapsedSeconds}s elapsed)`);
     
   } catch (error) {
-    const elapsedMinutes = Math.round((Date.now() - startTime) / 60000);
-    console.error(`✗ Login was not completed within ${elapsedMinutes} minutes`);
+    const elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
+    console.error(`✗ Login timeout after ${elapsedSeconds}s`);
     console.error(`  Last URL: ${page.url()}`);
     await captureDebugArtifacts(page, "login-timeout");
-    throw new Error(`Login timeout after ${elapsedMinutes} minutes. Check ${DEBUG_DIR} for debug files.`);
+    throw new Error(`Login timeout after ${elapsedSeconds}s. Check ${DEBUG_DIR} for debug files.`);
   }
 }
 
