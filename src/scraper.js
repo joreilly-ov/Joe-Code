@@ -21,7 +21,7 @@ async function scrape() {
   });
 
   const context = await browser.newContext();
-  const page = await context.newPage();
+  let page = await context.newPage();
 
   console.log("Opening OVCD...");
   try {
@@ -41,7 +41,11 @@ async function scrape() {
     console.log("  once it detects you are logged in...");
     console.log("==============================================");
     console.log("");
-    await waitForLoginWithRedirect(page);
+    const loggedInPage = await waitForLoginWithRedirect(context, page);
+    if (loggedInPage !== page) {
+      console.log(`Switching to authenticated tab: ${loggedInPage.url()}`);
+    }
+    page = loggedInPage;
   }
 
   console.log("Logged in! Starting data extraction...");
@@ -74,61 +78,72 @@ async function scrape() {
   return output;
 }
 
-async function waitForLoginWithRedirect(page) {
+async function waitForLoginWithRedirect(context, initialPage) {
   const timeoutMs = 5 * 60 * 1000; // 5 minutes
   const startTime = Date.now();
-  
+
   console.log("Waiting for OAuth redirect and login completion...");
-  
+  console.log("This may take a minute if you need to complete MFA or authorization.");
+
   try {
-    // Poll for URL change from login.microsoftonline.com to ovcd.oneviewhealthcare.com
-    const redirectDetected = await page.waitForFunction(
-      () => {
-        const url = window.location.href.toLowerCase();
-        return url.includes("ovcd.oneviewhealthcare.com");
-      },
-      { timeout: timeoutMs, polling: 1000 }
-    );
-    
-    console.log(`✓ OAuth redirect detected at: ${page.url()}`);
-    
-    // Wait for the page to fully load after redirect
-    try {
-      await page.waitForLoadState("networkidle", { timeout: 30000 });
-      console.log("✓ Page loaded");
-    } catch {
-      console.log("✓ Page interactive (network may still be loading)...");
+    const pollInterval = 2000;
+    let lastLogTime = startTime;
+
+    while (Date.now() - startTime < timeoutMs) {
+      const elapsed = Math.round((Date.now() - startTime) / 1000);
+
+      // Log progress every 15 seconds so user knows it's still waiting
+      if (Date.now() - lastLogTime > 15000) {
+        console.log(`  Still waiting for login... (${elapsed}s elapsed)`);
+        lastLogTime = Date.now();
+      }
+
+      // Check all open tabs for an authenticated OVCD page
+      for (const p of context.pages()) {
+        if (p.isClosed()) continue;
+
+        const url = p.url().toLowerCase();
+        if (!url.includes("ovcd.oneviewhealthcare.com")) continue;
+        // Skip mid-auth callback URLs
+        if (url.includes("/.auth/") || url.includes("/signin")) continue;
+
+        const looksAuthenticated = await p.evaluate(() => {
+          const hasPasswordField = Boolean(
+            document.querySelector("input[type=password], input[name*=password i]")
+          );
+          return !hasPasswordField;
+        }).catch(() => false);
+
+        if (looksAuthenticated) {
+          await p.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
+          console.log(`✓ Login complete (${elapsed}s elapsed). URL: ${p.url()}`);
+          return p;
+        }
+      }
+
+      await initialPage.waitForTimeout(pollInterval);
     }
-    
-    // Wait a bit for any post-redirect auth cookies/state to settle
-    await page.waitForTimeout(2000);
-    
-    // Verify we're on OVCD and login is complete
-    const isLoggedIn = await page.evaluate(() => {
-      const url = window.location.href.toLowerCase();
-      const onOVCD = url.includes("ovcd.oneviewhealthcare.com");
-      const hasPasswordField = Boolean(
-        document.querySelector("input[type=password], input[name*=password i]")
-      );
-      const hasLoginForm = Boolean(
-        document.querySelector("form[action*=login], input[name=username], input[name=email]")
-      );
-      return onOVCD && !hasPasswordField && !hasLoginForm;
-    });
-    
-    if (!isLoggedIn) {
-      throw new Error("OAuth redirect completed but login form still present");
-    }
-    
-    const elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
-    console.log(`✓ Login verified (${elapsedSeconds}s elapsed)`);
-    
+
+    throw new Error("Timed out waiting for authenticated OVCD page in any tab");
   } catch (error) {
     const elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
-    console.error(`✗ Login timeout after ${elapsedSeconds}s`);
-    console.error(`  Last URL: ${page.url()}`);
-    await captureDebugArtifacts(page, "login-timeout");
-    throw new Error(`Login timeout after ${elapsedSeconds}s. Check ${DEBUG_DIR} for debug files.`);
+    const currentUrl = initialPage.url();
+    
+    console.error(`✗ Login failed after ${elapsedSeconds}s`);
+    console.error(`  Current URL: ${currentUrl}`);
+    
+    if (currentUrl.includes("login.microsoftonline.com")) {
+      console.error(`  ⚠ Still on Microsoft login page. This could mean:`);
+      console.error(`    - You haven't completed login yet`);
+      console.error(`    - MFA/additional verification is required`);
+      console.error(`    - OVCD OAuth callback is not working`);
+    }
+    
+    // Capture page state for debugging
+    await captureDebugArtifacts(initialPage, `login-timeout-${Math.round(Date.now() / 1000)}`);
+    console.error(`  Debug files saved to: ${DEBUG_DIR}`);
+    
+    throw new Error(`Login detection failed after ${elapsedSeconds}s. Check debug files for page state.`);
   }
 }
 
