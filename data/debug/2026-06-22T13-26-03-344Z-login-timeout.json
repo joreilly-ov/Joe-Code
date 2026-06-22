@@ -1,0 +1,5 @@
+{
+  "reason": "login-timeout",
+  "url": "https://login.microsoftonline.com/14f3b174-9cdb-4a5e-9177-18c3bccc87cb/oauth2/v2.0/authorize?response_type=code+id_token&redirect_uri=https%3A%2F%2Fovcd.oneviewhealthcare.com%2F.auth%2Flogin%2Faad%2Fcallback&client_id=70a237cf-1dcf-4898-8a0e-39836a69751c&scope=openid+profile+email&response_mode=form_post&nonce=b3b701910acc412b90a558aa2a9e2f74_20260622133032&state=redir%3D%252F&sso_reload=true",
+  "capturedAt": "2026-06-22T13:26:04.035Z"
+}

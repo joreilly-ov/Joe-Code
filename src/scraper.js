@@ -24,7 +24,11 @@ async function scrape() {
   const page = await context.newPage();
 
   console.log("Opening OVCD...");
-  await page.goto(OVCD_URL);
+  try {
+    await page.goto(OVCD_URL, { waitUntil: "domcontentloaded", timeout: 30000 });
+  } catch (err) {
+    console.log("Page load initiated (may redirect to login)...");
+  }
 
   if (useEnvCredentials) {
     console.log("Using environment credentials...");
@@ -37,7 +41,7 @@ async function scrape() {
     console.log("  once it detects you are logged in...");
     console.log("==============================================");
     console.log("");
-    await waitForLogin(page);
+    await waitForLoginWithRedirect(page);
   }
 
   console.log("Logged in! Starting data extraction...");
@@ -70,19 +74,76 @@ async function scrape() {
   return output;
 }
 
+async function waitForLoginWithRedirect(page) {
+  const timeoutMs = 5 * 60 * 1000; // 5 minutes
+  const startTime = Date.now();
+  
+  console.log("Waiting for OAuth redirect and login completion...");
+  
+  try {
+    // Wait for the OAuth callback URL pattern
+    await page.waitForURL(
+      url => url.includes("ovcd.oneviewhealthcare.com"),
+      { timeout: timeoutMs }
+    );
+    
+    console.log(`✓ OAuth redirect detected. Final URL: ${page.url()}`);
+    
+    // Wait for the page to fully load after redirect
+    await page.waitForLoadState("networkidle", { timeout: 30000 }).catch(() => {
+      console.log("Page interactive (network may still be loading)...");
+    });
+    
+    // Verify we're on OVCD and login is complete
+    const isLoggedIn = await page.evaluate(() => {
+      const url = window.location.href.toLowerCase();
+      const onOVCD = url.includes("ovcd.oneviewhealthcare.com");
+      const hasPasswordField = Boolean(
+        document.querySelector("input[type=password], input[name*=password i]")
+      );
+      const hasLoginForm = Boolean(
+        document.querySelector("form[action*=login], input[name=username], input[name=email]")
+      );
+      return onOVCD && !hasPasswordField && !hasLoginForm;
+    });
+    
+    if (!isLoggedIn) {
+      throw new Error("OAuth redirect completed but login form still present");
+    }
+    
+    console.log(`✓ Login verified (${Math.round((Date.now() - startTime) / 1000)}s elapsed)`);
+    
+  } catch (error) {
+    const elapsedMinutes = Math.round((Date.now() - startTime) / 60000);
+    console.error(`✗ Login was not completed within ${elapsedMinutes} minutes`);
+    console.error(`  Last URL: ${page.url()}`);
+    await captureDebugArtifacts(page, "login-timeout");
+    throw new Error(`Login timeout after ${elapsedMinutes} minutes. Check ${DEBUG_DIR} for debug files.`);
+  }
+}
+
 async function waitForLogin(page) {
   const timeoutMs = 5 * 60 * 1000;
   try {
     await page.waitForFunction(
       () => {
         const url = window.location.href.toLowerCase();
-        const looksLikeLoginUrl =
-          url.includes("login") || url.includes("signin") ||
-          url.includes("account/login") || url.includes("/auth");
+        // ✓ Check if we're on the OVCD domain (after OAuth redirect)
+        const onOVCDDomain = url.includes("ovcd.oneviewhealthcare.com");
+        
+        // ✓ Check if we're still on a login page (without OVCD domain)
+        const stuckOnLoginPage = 
+          (url.includes("login") || url.includes("signin") || 
+           url.includes("account/login") || url.includes("/auth")) &&
+          !onOVCDDomain;
+        
+        // ✓ Check if there's a password field visible
         const hasPasswordField = Boolean(
           document.querySelector("input[type=password], input[name*=password i]")
         );
-        return !looksLikeLoginUrl && !hasPasswordField;
+        
+        // Return true if: we're on OVCD domain OR (not stuck on login AND no password field)
+        return onOVCDDomain || (!stuckOnLoginPage && !hasPasswordField);
       },
       { timeout: timeoutMs }
     );
