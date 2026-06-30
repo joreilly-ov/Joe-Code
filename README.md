@@ -51,6 +51,66 @@ Run only syntax checks:
 npm run check:syntax
 ```
 
+## Build Skill Context From Teams/Slack/Files
+
+Use this when you want to ingest exported chat/file content and turn it into a local context pack you can feed into a skill.
+
+1. Put source files into `test file import/` (or another folder)
+2. Run:
+
+```bash
+npm run context:build
+```
+
+Or customize paths and output name:
+
+```bash
+node scripts/build-skill-context.js --input "./test file import" --name "my-channel-context"
+```
+
+Outputs are written to `data/skill-context/`:
+
+- `<name>.md` - normalized transcript for review
+- `<name>.jsonl` - chunked records for retrieval/context pipelines
+- `<name>.manifest.json` - metadata and counts
+
+Supported input types:
+
+- Slack export JSON arrays (`text`, `ts`, `user`)
+- Teams-style JSON objects with `messages` arrays
+- Plain files (`.txt`, `.md`, `.csv`, `.log`)
+
+Tip: for very large channels, use a lower chunk size to keep retrieval units smaller:
+
+```bash
+node scripts/build-skill-context.js --chunk-size 1200
+```
+
+### Aggressive Noise Cleanup
+
+After building a context pack, run an aggressive cleanup pass to remove system chatter, duplicate lines, links, mention artifacts, and low-signal fragments.
+
+```bash
+npm run context:clean
+```
+
+This auto-selects the newest non-clean `.jsonl` file in `data/skill-context/` and writes:
+
+- `<name>.clean.jsonl`
+- `<name>.clean.manifest.json`
+
+Run build + clean in one step:
+
+```bash
+npm run context:build:clean
+```
+
+Or target a specific input file:
+
+```bash
+node scripts/clean-skill-context.js --input ./data/skill-context/my-channel-context.jsonl --chunk-size 1200
+```
+
 ## How It Works
 
 | Mode | How to use |
