@@ -1,0 +1,112 @@
+{
+  "batch": "2026-09-04-device-certification-portfolio",
+  "created": "2026-09-04",
+  "mode": "new",
+  "subjectTicket": null,
+  "targetProject": "CEP",
+  "targetEpic": null,
+  "ticketCount": 1,
+  "sources": [
+    {
+      "type": "existing-cep-context",
+      "key": "CEP-14431",
+      "title": "Hardware || ELO STB Phase 2"
+    },
+    {
+      "type": "existing-cep-context",
+      "key": "CEP-2120",
+      "title": "Elo STB Device Certification (MPI)"
+    },
+    {
+      "type": "existing-cep-context",
+      "key": "CEP-15008",
+      "title": "Social Mobile || Android 12 || Bluetooth Adapter app unable to scan for new devices"
+    },
+    {
+      "type": "existing-cep-context",
+      "key": "CEP-10232",
+      "title": "Android 14 Wetek ROM Certification"
+    }
+  ],
+  "classification": {
+    "primary": {
+      "id": "A9",
+      "name": "Device, ROM and firmware certification",
+      "confidence": "high"
+    },
+    "runnerUp": {
+      "id": "A7",
+      "name": "Fleet upgrade and dependency sweep"
+    },
+    "reason": "The source set is organized around device-specific certification, ROM compatibility, peripheral behaviour, and OTA or control capabilities. A7 is secondary but does not fit because there is no single shared framework or dependency upgrade across an enumerated service fleet."
+  },
+  "proposedSummary": "Hardware | Device certification and compatibility",
+  "scopeStrategy": {
+    "CEP-14431": "consolidate-existing-elo-workstream",
+    "CEP-2120": "consolidate-existing-elo-workstream",
+    "CEP-10232": "retain-wetek-certification-workstream",
+    "CEP-15008": "reference-as-social-mobile-validation-evidence-not-open-deliverable",
+    "CEP-15136": "related-samsung-follow-on-not-an-input-source"
+  },
+  "dependencies": {
+    "jiraMcp": true,
+    "confluenceMcp": true,
+    "azureDevOpsMcp": true,
+    "jiraExport": false,
+    "qaTestPlan": true,
+    "sbomDeltaTrigger": false,
+    "localCodebase": false,
+    "oneviewContext": false
+  },
+  "humanGates": {
+    "gate1": {
+      "decision": "delegated-autonomous-approval",
+      "instruction": "The user is not available to respond and will review your work later. Work autonomously and make good decisions.",
+      "archetype": "A9",
+      "ticketCount": 1,
+      "targetEpic": null,
+      "continueWithoutJiraExport": true
+    },
+    "gate2": {
+      "decision": "delegated-autonomous-acceptance",
+      "acceptedRequiredGaps": [
+        "GAP-01",
+        "GAP-02",
+        "GAP-03",
+        "GAP-04"
+      ],
+      "acceptedRecommendedGaps": [
+        "GAP-05",
+        "GAP-06",
+        "GAP-07"
+      ],
+      "duplicateDisposition": {
+        "CEP-14431": "consolidation-source",
+        "CEP-2120": "consolidation-source",
+        "CEP-10232": "consolidation-source",
+        "CEP-6770": "related-not-duplicate",
+        "CEP-976": "related-future-stream-not-duplicate"
+      }
+    },
+    "gate3": {
+      "decision": "delegated-autonomous-approval",
+      "exportMode": "local-csv-only",
+      "approvedAt": "2026-09-04",
+      "instruction": "The user is not available to respond and will review your work later. Work autonomously and make good decisions."
+    }
+  },
+  "validation": {
+    "cycle": 2,
+    "gate": "PASS",
+    "score": "19/20",
+    "provenanceClaims": "118/118",
+    "reason": "Final validation found no provenance failures, style defects, PHI, credentials, or improper fixes."
+  },
+  "export": {
+    "mode": "local-csv-only",
+    "jiraModified": false,
+    "confluenceModified": false,
+    "artifact": "jira-import.csv"
+  },
+  "status": "complete-local-review-package"
+}

@@ -1,0 +1,99 @@
+<!-- markdownlint-disable MD041 -->
+### Summary
+
+Create an umbrella Epic for hardware device certification and compatibility across Elo, Wetek, Social Mobile, and Samsung workstreams. Use it to define common certification evidence and coordinate the remaining portfolio decisions without changing the disposition of existing issues.
+
+### Context
+
+The hardware strategy identifies Wetek STBs, Social Mobile AIOs, Samsung tablets, Elo models, and pending Zebra certification as a fragmented device landscape. It defines a unified next-generation device approach intended to balance reliability, standardisation, innovation, and commercial pragmatism, with hardware standardisation intended to reduce operational overhead and support complexity.
+
+This Epic brings the available certification and compatibility evidence into one portfolio view. Existing Elo Phase 2, Elo MPI, and Wetek Epics remain governed by GAP-01. CEP-15008 remains a Backlog Task despite reported successful validation and a merged implementation, so its final workflow disposition remains governed by GAP-07 rather than being treated as open implementation scope.
+
+### Evidence
+
+| Workstream | Verified state | Active or remaining evidence | Source |
+| --- | --- | --- | --- |
+| Elo Phase 2 | CEP-14431 is an In Progress Epic with six nonterminal children | Managed app configuration, CEC control, OTA firmware discovery, Admin Solution verification, Android 14 and new Elo SDK support, and Elo status for CHI | CEP-14431 fields, description, and complete child search |
+| Elo MPI legacy remainder | CEP-2120 is an In Progress Epic with 17 children: nine Done, two Complete, two Backlog, and four Won't Do | CEP-6340 and CEP-6911 are the remaining Backlog children; each is estimated at three points | CEP-2120 fields, description, and complete child search |
+| Wetek Android 14 | CEP-10232 is a Ready for Refinement Epic with ten children: three Complete, two Done, one In Development, one QA, and three Won't Do | CEP-10865 is in QA and CEP-16094 is In Development | CEP-10232 fields, description, and complete child search |
+| Social Mobile Android 12 | CEP-15008 is a Backlog Task for Bluetooth scanning on ROM `OV2219_20251220` | Chirag Mali reported physical-device validation with Bluetooth Adapter `2026.1.29.1`; Sheshwanth Gundeti reported the PR merged and artifact `2026.1.30.1` published | CEP-15008 fields, description, and comments dated 2026-01-30 and 2026-02-12 |
+| Samsung Android 14 | CEP-15136 is a Ready for QA Defect | Bluetooth pairing when launched inside the Oneview client | CEP-15136 fields |
+
+The internal repository `Inpatient.AndroidBluetoothAdapter` exists under Azure DevOps project `OneviewNewClient`. At commit `33354e27911abc3c51a97eea8c708a9b55f857ca`, `Oneview.Inpatient.AndroidBluetoothAdapter.nuspec` line 4 declares package identifier `com.oneviewhealthcare.client.droid.bluetoothAdapter`.
+
+### Capability/workstream matrix
+
+| Workstream | Portfolio purpose | Current support or evidence state | Certification evidence to retain | Open decision or gap |
+| --- | --- | --- | --- | --- |
+| Elo Phase 2 | Continue Elo Backpack STB certification | Six nonterminal children cover managed app configuration, CEC control, OTA discovery, Admin verification, Android 14 and Elo SDK support, and CHI status | Preserve the status and outputs of CEP-14432, CEP-14433, CEP-14434, CEP-9578, CEP-16366, and CEP-17612 | Common exit criteria, current vendor targets, ownership, sequencing, and vendor specifications remain unresolved |
+| Elo MPI legacy remainder | Preserve completed certification history and disposition remaining LRC work | Nine children are Done and two are Complete; CEP-6340 and CEP-6911 remain Backlog | Preserve completed five-point examples CEP-2121, CEP-6324, CEP-6339, and CEP-6435 alongside remaining backlog | Governance, common exit criteria, current vendor targets, ownership, sequencing, and vendor specifications remain unresolved |
+| Wetek Android 14 | Complete and evidence the Android 14 ROM certification workstream | CEP-10865 is in QA, CEP-16094 is In Development, and CEP-14013 is a completed five-point libcec example | Preserve completed and active child evidence under CEP-10232 | Governance, common exit criteria, current target model and ROM, ownership, sequencing, and vendor specifications remain unresolved |
+| Social Mobile Android 12 evidence | Retain validation and implementation evidence for Bluetooth scanning | Successful physical-device validation, merged implementation, and published artifacts were reported; CEP-15008 remains Backlog | Preserve CEP-15008 comments and the verified adapter repository and package identity | Final CEP-15008 workflow disposition and customer applicability remain unresolved |
+| Samsung Android 14 follow-on | Track the Bluetooth pairing follow-on separately from Social Mobile validation | CEP-15136 is Ready for QA | Preserve QA evidence against CEP-15136 | Common exit criteria, current device target, ownership, sequencing, and customer applicability remain unresolved |
+
+### Acceptance criteria
+
+- AC-1: Record the approved governance decision for whether this Epic supersedes, links, or reparents CEP-14431, CEP-2120, and CEP-10232 before any JIRA restructuring occurs.
+- AC-2: Define one minimum certification exit-criteria matrix covering the applicable STB, AIO, and tablet capabilities and the evidence required for each capability.
+- AC-3: Record the current target model, ROM, firmware, and vendor release for every applicable workstream, or mark the item not applicable with an approved rationale.
+- AC-4: Assign a named owner, sequence, and target release to every remaining portfolio work item.
+- AC-5: Link or attach the authoritative Elo and Wetek certification specifications used to assess their workstreams.
+- AC-6: Record the supported customer and site combinations for each device workstream before customer-specific certification is represented as complete.
+- AC-7: Record the final workflow disposition of CEP-15008 without representing its successfully reported implementation and validation as new open implementation scope.
+- AC-8: Keep CEP-15136 as the Samsung Android 14 follow-on and capture its QA outcome independently of the CEP-15008 Social Mobile evidence.
+- AC-9: Preserve the evidence-based lower bound of 28 points across eight pointed nonterminal children and identify the two additional unpointed Wetek items for refinement.
+
+### Out of scope
+
+- Reparenting CEP-14431, CEP-2120, or CEP-10232 before GAP-01 is resolved.
+- Reimplementing CEP-15008 as part of this Epic.
+- Selecting the next-generation STB; the STB strategy owns that decision.
+- Adding Zebra certification work beyond acknowledging it as part of the fragmented device landscape.
+
+### Related
+
+| System | ID | Title or description |
+| --- | --- | --- |
+| JIRA | CEP-14431 | Hardware \|\| ELO STB Phase 2 |
+| JIRA | CEP-2120 | Elo STB Device Certification (MPI) |
+| JIRA | CEP-10232 | Android 14 Wetek ROM Certification |
+| JIRA | CEP-15008 | Social Mobile Android 12 Bluetooth scanning task |
+| JIRA | CEP-15136 | Samsung Android 14 Bluetooth pairing follow-on |
+| Confluence | 6069125153 | Hardware Strategy 2026 |
+| Confluence | 6636634113 | Hardware Strategy - STB - 2026 |
+| Azure DevOps | Inpatient.AndroidBluetoothAdapter | Repository under OneviewNewClient at commit `33354e27911abc3c51a97eea8c708a9b55f857ca` |
+
+### Known gaps
+
+- [ ] GAP-01: Decide whether this umbrella Epic supersedes, links, or reparents CEP-14431, CEP-2120, and CEP-10232 - Product and Platform Engineering to record the migration rule before JIRA restructuring.
+- [ ] GAP-02: Define common certification exit criteria across STB, AIO, and tablet workstreams - Product, Platform Engineering, and QA to agree a minimum capability and evidence matrix.
+- [ ] GAP-03: Confirm the current target model, ROM, firmware, and vendor release for each workstream - device owners to populate the capability matrix from current vendor releases.
+- [ ] GAP-04: Assign a named owner, sequence, and target release for portfolio completion - Platform leadership to assign ownership and release sequencing.
+- [ ] GAP-05: Provide authoritative Elo and Wetek vendor certification specifications - link current vendor specifications or attach approved certification checklists.
+- [ ] GAP-06: Confirm customer and site applicability for each device combination - Product and Customer Success to provide supported deployment combinations.
+- [ ] GAP-07: Confirm the final workflow disposition of CEP-15008 - ticket owner to confirm closure or remaining Social Mobile work.
+
+### Other information
+
+The Device and Platform fields were not available in the supplied Epic create-screen field list. Their intended scope is carried in the capability/workstream matrix without inventing field values. Customer is available but is intentionally not populated until GAP-06 is resolved.
+
+---
+**Suggested estimate:** At least 28 child points; no single Epic estimate is proposed.
+Eight pointed nonterminal children total 28 points, with two additional unpointed Wetek items. This evidence-based lower bound is calibrated against completed five-point examples CEP-2121, CEP-6339, CEP-6435, and CEP-14013. Refinement to confirm the remaining child estimates and any Epic-level convention.
+
+---
+
+### Dev test brief
+
+**Layer allocation:** mixed
+**Must-pass scenarios:**
+
+- Confirm each listed workstream has a current evidence state, retained evidence, and an explicit open decision or gap.
+- Confirm CEP-15008 is represented as evidence with an unresolved workflow disposition, not as open implementation scope.
+- Confirm no source Epic is reparented until GAP-01 is resolved.
+- Confirm the lower-bound estimate remains eight pointed nonterminal children totaling 28 points, plus two unpointed Wetek items.
+**Regression guard:** Existing source issue dispositions and certification evidence remain distinguishable after portfolio consolidation.
+**Environment:** JIRA portfolio review using the related issues and evidence sources listed in this Epic.
+**Evidence required for handover:** Approved governance decision, completed capability and exit-criteria matrix, current device target details, named owners and release sequence, linked vendor specifications, customer applicability, CEP-15008 disposition, and CEP-15136 QA outcome.
+
+_Drafted with platform-ticket-generation v0.1.0 on 2026-09-04 from CEP-14431, CEP-2120, CEP-15008, and CEP-10232. AI Generated - Needs Human Review._

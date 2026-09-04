@@ -1,0 +1,9 @@
+{
+	"servers": {
+		"ov-mcp": {
+			"url": "https://mcp-general.tools.oneviewhealthcare.com/mcp/allcrud",
+			"type": "http"
+		},
+	},
+	"inputs": []
+}

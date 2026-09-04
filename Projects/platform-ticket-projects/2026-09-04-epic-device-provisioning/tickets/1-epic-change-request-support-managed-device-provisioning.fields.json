@@ -1,0 +1,70 @@
+{
+    "project": "CEP",
+    "issuetype": "Story",
+    "screen_resolved_at": "2026-09-04",
+    "fields": {
+        "Summary": "Epic | Change request | Support managed device provisioning",
+        "Description": "### Summary\r\nCEP-17337 requests managed-device exports and provisioning values for Epic remote provisioning.\r\n\r\n### Context\r\nCEP-17337 requests support for an Epic device provisioning process. It states that Epic needs device identifiers, a web server URL, and a provisioning token for remote provisioning. CEP-17337 also requests that health system staff export managed-device data and set or update managed values through the MDM.\r\n\r\nDes Lynch reports in CEP-17337 that the team should determine how the requested export fields are stored and reported. Des Lynch also records implementation assumptions for the unique hardware value, provisioning token, hardware identifier mapping, and per-device export fields; these assumptions have not been independently confirmed.\r\n\r\n### Evidence\r\n| Field | Value |\r\n|-------|-------|\r\n| Component | CEP-17337 describes requirements for MDM export, managed configuration delivery, and hardware identifier behaviour; owning components are not code-verified |\r\n| Requested by | CEP-17337 |\r\n| Request source | CEP-17337 description and comments dated 2026-08-19 and 2026-09-02 |\r\n| Affected customers | Not established; see GAP-04 |\r\n| Vendor dependency | Epic requirements are described in CEP-17337; the authoritative Epic specification is not verified |\r\n| Reference documentation | No authoritative Epic specification was verified; see GAP-05 |\r\n\r\n### User story\r\nAs a **health system staff member**, when **setting up Epic device provisioning**, I want **to export managed-device identifiers and maintain the provisioning values requested in CEP-17337** so that **devices can be mapped and provisioned remotely**.\r\n\r\n### Current behaviour\r\nThe web server URL can currently be sent through an Intent extra. That method must remain supported for now. No other current implementation behaviour is verified by the evidence pack.\r\n\r\n### Requested behaviour\r\nCEP-17337 requires health system staff to export a CSV from the MDM containing all managed devices and at least bedside_tv_hardware_id. It describes location_label and epic_bed_record_id as optional export columns.\r\n\r\nCEP-17337 requires each TV to expose a globally unique, stable bedside_tv_hardware_id in Android Managed Configurations and requires the MDM to report the same value. CEP-17337 specifies that the value begins with the Epic-assigned vendor name followed by a tilde, with a serial number or MAC address listed as an acceptable unique portion.\r\n\r\nCEP-17337 also requires organization staff to set and update bedside_tv_webserver_url and bedside_tv_provisioning_token through the MDM. The existing Intent-extra method for sending the web server URL remains supported for now.\r\n\r\n### Configurable or global\r\nThe configuration boundary is not established. Product and Engineering must decide whether each requested value and export field is organization-specific, device-specific, or globally standardized, as recorded in GAP-03.\r\n\r\n### Acceptance criteria\r\n- **AC-1:** Given a health system staff member exports managed-device data as requested by CEP-17337, when the CSV is generated, then it contains all managed devices and a bedside_tv_hardware_id value for each exported device.\r\n- **AC-2a:** Given a device exposes a bedside_tv_hardware_id and the MDM reports that identifier, when the two values are compared, then they match.\r\n- **AC-2b:** Given a device has a bedside_tv_hardware_id, when the device is factory reset, then the identifier after the reset matches the identifier recorded before the reset.\r\n- **AC-2c:** Given the managed-device set is exported, when the bedside_tv_hardware_id values are compared, then no duplicates exist in that exported set.\r\n- **AC-2d:** Given a bedside_tv_hardware_id is exposed, when its format is inspected, then it begins with the Epic-assigned vendor name followed by a tilde.\r\n- **AC-3:** Given organization staff manage the provisioning values requested by CEP-17337, when bedside_tv_webserver_url or bedside_tv_provisioning_token is set or updated through the MDM, then the new value is available to the provisioning process according to the configuration boundary agreed under GAP-03.\r\n- **AC-4:** Given the web server URL is supplied through the currently supported Intent-extra method, when provisioning starts, then that delivery method continues to be supported.\r\n- **AC-5:** Record the agreed treatment of the optional location_label and epic_bed_record_id export columns, including whether and when each column is emitted.\r\n\r\n### Out of scope\r\n- Removing the currently supported Intent-extra method for the web server URL\r\n- Work outside the Epic device provisioning requirements recorded in CEP-17337\r\n- Treating the implementation assumptions in CEP-17337 comments as agreed design without Product and Engineering confirmation\r\n\r\n### Related\r\n| System | ID | Title or description |\r\n|--------|----|----------------------|\r\n| JIRA | CEP-16233 | Parent epic of CEP-17337 |\r\n| JIRA | CEP-16711 | Move Epic Bedside TV Webserver URL from Admin App Managed Configuration to Hospital Property - related completed compatibility work, not a duplicate |\r\n| JIRA | CEP-16759 | Epic 2027 Store Requirements - related Epic requirements context, not a duplicate |\r\n\r\n### Known gaps\r\n- [ ] GAP-01: Verify current behaviour for CSV export, hardware identifier exposure, and provisioning-token delivery - Product and Engineering to state what exists today and verify it against the owning repositories\r\n- [ ] GAP-02: Establish code-verified ownership for MDM export, managed configuration delivery, and hardware identifier construction - re-run grounding with confirmed Azure DevOps project and repository identifiers, or provide the owning repositories\r\n- [ ] GAP-03: Decide whether each requested value and export field is configurable per organization, configurable per device, or globally standardized - Product and Engineering to record the boundary explicitly\r\n- [ ] GAP-04: Identify affected customers or confirm that the change applies to all Epic deployments covered by CEP-17337 - Product or Customer Success to confirm scope\r\n- [ ] GAP-05: Provide the authoritative Epic specification for field names, formats, token length, and lifecycle behaviour - link or attach the current specification\r\n- [ ] GAP-06: Define backwards compatibility between managed configuration and hospital-property delivery paths - reconcile CEP-17337 with CEP-16711 and record which path remains supported for each value\r\n\r\n### Other information\r\nThe following A5 recommended custom fields are unavailable on the live Story create screen for this batch and are therefore carried in the body rather than populated:\r\n\r\n| Intended field | Carried value |\r\n|----------------|---------------|\r\n| Customer | Not established; see GAP-04 |\r\n| Customer Specific | Not established; see GAP-03 and GAP-04 |\r\n| CustomerFacing | Not established; see GAP-04 |\r\n| Product | Epic device provisioning requirements per CEP-17337 |\r\n| Feature (Inpatient) | Epic device provisioning requirements per CEP-17337 |\r\n| Affected services | Not code-verified; see GAP-02 |\r\n\r\n---\r\n**Suggested estimate:** 3 points (M)\r\nBounded provisioning and configuration change request, with lower confidence because ownership and configuration boundaries remain unresolved. Calibrated against CEP-16711 (3 points, Done), CEP-16347 (3 points, Done), and CEP-16346 (3 points, Done).\r\nRefinement to confirm.\r\n\r\n---\r\n### Dev test brief\r\n**Layer allocation:** mixed\r\n**Must-pass scenarios:**\r\n- Export managed-device data with the required hardware identifier and the agreed optional columns.\r\n- Expose and report the same stable, globally unique hardware identifier in the format requested by CEP-17337.\r\n- Set and update the requested web server URL and provisioning token values through the agreed configuration boundary.\r\n- Supply the web server URL through the existing Intent-extra method and confirm that it remains supported.\r\n**Regression guard:** The currently supported Intent-extra method for supplying the web server URL continues to work.\r\n**Environment:** An agreed validation environment selected after ownership is verified under GAP-02.\r\n**Evidence required for handover:** Sanitized CSV output, identifier comparison, configuration update results, and evidence that the Intent-extra path remains supported; no provisioning-token values or credentials are included.\r\n\r\n_Drafted with platform-ticket-generation v0.1.0 on 2026-09-04 from CEP-17337. AI Generated - Needs Human Review._\r\n",
+        "Issue Type": "Story",
+        "Priority": "Medium",
+        "XF Team": "Platform Team",
+        "Labels": [
+            "small-feature-fix",
+            "epic-device-provisioning"
+        ],
+        "Parent": "CEP-16233",
+        "Fix versions": [
+            "Placeholder"
+        ],
+        "Story Points": 3
+    },
+    "unavailable_on_screen": [
+        {
+            "field": "Customer",
+            "value": "Not established - see GAP-04",
+            "carried_in_body": true
+        },
+        {
+            "field": "Customer Specific",
+            "value": "Not established - see GAP-03 and GAP-04",
+            "carried_in_body": true
+        },
+        {
+            "field": "CustomerFacing",
+            "value": "Not established - see GAP-04",
+            "carried_in_body": true
+        },
+        {
+            "field": "Product",
+            "value": "Epic device provisioning requirements per CEP-17337",
+            "carried_in_body": true
+        },
+        {
+            "field": "Feature (Inpatient)",
+            "value": "Epic device provisioning requirements per CEP-17337",
+            "carried_in_body": true
+        },
+        {
+            "field": "Affected services",
+            "value": "Not code-verified - see GAP-02",
+            "carried_in_body": true
+        }
+    ],
+    "provenance": {
+        "Summary": "COMPOSED - A5 house-style summary from the Epic provisioning change request in CEP-17337; no blocked code entity is asserted",
+        "Description": "COMPOSED - ticket body sourced from the verified facts, attributed reported claims, and dispositioned gaps in evidence-pack.md",
+        "Issue Type": "VERIFIED - CEP-17337 / IssueType is Story and the selected A5 archetype specifies Story",
+        "Priority": "VERIFIED - CEP-17337 / Priority is Medium",
+        "XF Team": "VERIFIED - the live CEP Story create-field metadata read on 2026-09-04 includes Platform Team as an allowed XF Team value",
+        "Labels": "SUGGESTED - descriptive archetype and subject tags derived from the request",
+        "Parent": "VERIFIED - CEP-17337 / ParentKey is CEP-16233 and target_epic is CEP-16233",
+        "Fix versions": "VERIFIED - CEP-17337 / FixVersions is Placeholder",
+        "Story Points": "SUGGESTED - the evidence pack's Advisory estimate derived for refinement entry calibrates 3 points against CEP-16711, CEP-16347, and CEP-16346, each 3 points and Done; not agreed"
+    },
+    "flags_for_orchestrator": [
+        "Customer, Customer Specific, CustomerFacing, Product, Feature (Inpatient), and Affected services are unavailable on the live Story create screen and are carried in the body.",
+        "CEP-16711 and CEP-16759 are related references, not duplicates.",
+        "All dispositioned gaps remain open in the ticket.",
+        "Blocked entity names appear only as requirements explicitly attributed to CEP-17337; no current implementation is invented."
+    ]
+}
