@@ -1,0 +1,36 @@
+{
+  "project": "CEP",
+  "issuetype": "Spike",
+  "screen_resolved_at": "2026-09-07T00:00:00Z",
+  "fields": {
+    "Summary": "SPIKE | What is the current Elo box status for CHI",
+    "Description": "<!-- phase: 4 | generated: 2026-09-07T00:00:00Z | batch: 2026-09-07-elo-chi-status-spike -->\n### Question\nWhat is the current supported Elo box configuration for CHI, and which existing Elo work must continue, close, or become follow-up work?\n\n### Why this needs investigation\nCEP-17612 records several unresolved questions across older Elo work, Android version support, the Admin app, a reported CHI installation issue, and the Oneview TV player. The parent epic CEP-14431 tracks Elo STB Phase 2 work, but the source ticket does not provide a consolidated current-status decision for CHI.\n\n### Context\nCEP-17612 is currently an In Development Story under the In Progress `Hardware || ELO STB Phase 2` epic, with an existing estimate of 3 story points. The source ticket asks whether an Elo setup exists in Dublin or elsewhere, whether CEP-14433 is Android-specific and needed for CHI, whether older CEP-2120 work remains needed, whether CEP-9578 represents the working Admin app, whether OST-1926 is the same installation problem, and whether a new Oneview TV player is required.\n\nThe source ticket's setup question is marked done. The remaining questions are not recorded as resolved in the supplied evidence.\n\n### Questions to answer\n1. Which Elo device model, operating system, and relevant firmware or vendor capability are currently in scope for CHI?\n2. Is the work in CEP-14433 Android-version-specific, and is that capability required for CHI?\n3. Are CEP-6911 and CEP-6340 still required, and what is their current disposition?\n4. Does CEP-9578 represent the working Admin app for this Elo solution?\n5. Is OST-1926 the same problem as the Admin app installation concern in CEP-17612?\n6. Is a new Oneview TV player required for the in-scope Elo device?\n\n### Spike output\n- [ ] Named output artefact is not present in the source evidence. The ticket owner must choose a decision record, written recommendation, Confluence page, or sized follow-up tickets before the spike starts.\n\n### Timebox\n- [ ] Timebox and escalation rule are not present in the source evidence. The ticket owner must set the number of working days and define what happens if the answer is not reached.\n\n### What this unblocks\nA confirmed CHI device and software scope, the disposition of the related Elo tickets, and any follow-up certification or implementation work under CEP-14431.\n\n### Constraints\n- The investigation is limited to the Elo/CHI questions recorded in CEP-17612 and the directly related tickets listed below.\n- The spike investigates and records a decision; it does not implement device, Android, Admin app, CEC, OTA, or TV player changes.\n- The relationship between CEP-17612 and OST-1926 remains to be confirmed.\n\n### Out of scope\n- Implementing changes to the Elo device, Android image, Admin app, CEC control, OTA flow, or Oneview TV player.\n- Reworking the wider hardware certification portfolio outside the Elo/CHI questions.\n- Modifying or commenting on OST-1926.\n\n### Related\n| System | ID | Title or description |\n|--------|----|----------------------|\n| JIRA | CEP-17612 | Source investigation ticket: ELO for CHI Spike |\n| JIRA | CEP-14431 | Hardware || ELO STB Phase 2 |\n| JIRA | CEP-14433 | ELO STB Certification Phase 2: CEC control |\n| JIRA | CEP-14432 | ELO managed app configuration |\n| JIRA | CEP-14434 | ELO OTA firmware update discovery |\n| JIRA | CEP-16366 | Android 14 and new Elo SDK support |\n| JIRA | CEP-2120 | Elo STB Device Certification (MPI) |\n| JIRA | CEP-6911 | ELO local room controls and AIDL settings |\n| JIRA | CEP-6340 | Admin Solution service to keep LRC alive |\n| JIRA | CEP-9578 | ELO Admin Solution verification |\n| JIRA | OST-1926 | CHI ELO Admin app installation issue, as named by CEP-17612 |\n\n### Known gaps\n- [ ] Named spike output artefact - ticket owner to define before work starts.\n- [ ] Timebox and escalation rule - ticket owner to define before work starts.\n- [ ] Person or milestone that needs the answer - Product or Platform owner to confirm.\n- [ ] Current status of every related ticket - ticket owner to refresh during refinement.\n- [ ] Whether CEP-17612 and OST-1926 describe the same issue - Support or ticket owner to confirm.\n- [ ] Current Elo model, OS, firmware, and CHI deployment target - device owner to provide.\n\n### Other information\nThe existing source estimate is 3 story points. The evidence pack calibrates this against the 3-point Elo items CEP-6340 and CEP-6911 and the 5-point Elo completion items CEP-2121, CEP-6339, and CEP-6435. Refinement must confirm the estimate after the output and timebox are defined.\n\n---\n**Suggested estimate:** 3 points (M)\nExisting source estimate and lower-bound calibration against CEP-6340 and CEP-6911 (3 points each). Refinement to confirm after the required output and timebox are defined.\n\n_Drafted with platform-ticket-generation v0.1.0 on 2026-09-07 from CEP-17612, CEP-14431, CEP-17430, and the 2026-09-04 device certification portfolio evidence pack. AI Generated - Needs Human Review._\n",
+    "Issue Type": "Spike",
+    "XF Team": "Platform Team",
+    "Parent": "CEP-14431"
+  },
+  "unavailable_on_screen": [
+    {
+      "field": "Timebox",
+      "value": "Required by the A6 template but no value is present in the source evidence",
+      "carried_in_body": true
+    },
+    {
+      "field": "Investigation reason",
+      "value": "The live Spike screen does not expose this reference field",
+      "carried_in_body": true
+    },
+    {
+      "field": "Desired Outcome",
+      "value": "The live Spike screen does not expose this reference field",
+      "carried_in_body": true
+    }
+  ],
+  "provenance": {
+    "Summary": "VERIFIED - derived from the confirmed A6 classification and the question recorded in CEP-17612",
+    "Description": "COMPOSED - ticket body sourced from the verified facts, reported claims, and dispositioned gaps in evidence-pack.md",
+    "Issue Type": "VERIFIED - A6 classification confirmed by the user; live Spike create screen returned only Spike as the issue type",
+    "XF Team": "SUGGESTED - platform-ticket-generation field-map convention for platform work",
+    "Parent": "VERIFIED - CEP-17612 ParentKey and CEP-14431 parent epic fields"
+  }
+}

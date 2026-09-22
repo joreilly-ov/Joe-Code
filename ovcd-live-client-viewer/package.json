@@ -1,0 +1,15 @@
+{
+  "name": "ovcd-live-client-viewer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local viewer for Live client environment versions from OVCD.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "playwright": "^1.55.0"
+  }
+}

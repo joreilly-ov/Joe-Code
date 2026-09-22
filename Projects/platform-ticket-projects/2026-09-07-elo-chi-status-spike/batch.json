@@ -1,0 +1,28 @@
+{
+  "schema_version": "0.1.0",
+  "batch": "2026-09-07-elo-chi-status-spike",
+  "created_at": "2026-09-07T00:00:00Z",
+  "sources": [
+    {
+      "type": "cep_ticket",
+      "value": "CEP-17612"
+    }
+  ],
+  "archetype": {
+    "id": "A6",
+    "name": "Spike and investigation",
+    "confidence": "high",
+    "runner_up": "A9 - Device, ROM and firmware certification",
+    "confirmed_by_user": true
+  },
+  "mode": "new",
+  "ticket_count": 1,
+  "target_epic": "CEP-14431",
+  "skill_dependencies": {
+    "jira_export": false,
+    "qa_test_plan": false,
+    "sbom_delta_trigger": false
+  },
+  "phase": 1,
+  "status": "intake-confirmed"
+}
