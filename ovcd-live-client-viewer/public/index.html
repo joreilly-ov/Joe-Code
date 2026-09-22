@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OVCD Live Clients</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="masthead">
+        <div>
+          <p class="kicker">OVCD / PERSONAL VIEW</p>
+          <h1>Live client environments</h1>
+          <p class="lede">Production and test versions, collected from the internal client catalogue.</p>
+        </div>
+        <button id="refresh" class="refresh" type="button">Refresh data</button>
+      </header>
+
+      <section class="status-bar" aria-live="polite">
+        <span id="state">Ready to fetch</span>
+        <span id="last-fetched" aria-label="Last update"></span>
+      </section>
+
+      <section id="message" class="message" hidden></section>
+
+      <section class="table-wrap" aria-label="Live clients">
+        <table>
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Prod version</th>
+              <th>Last installed / upgraded</th>
+              <th>Test version</th>
+              <th>Last installed / upgraded</th>
+            </tr>
+          </thead>
+          <tbody id="clients">
+            <tr class="empty"><td colspan="5">No data fetched yet.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <details class="diagnostics">
+        <summary>Fetch diagnostics</summary>
+        <pre id="diagnostics">No diagnostics yet.</pre>
+      </details>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
