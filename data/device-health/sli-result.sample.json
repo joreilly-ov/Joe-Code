@@ -1,0 +1,29 @@
+{
+  "generatedAt": "2026-06-30T12:44:31.822Z",
+  "monthMinutes": 43800,
+  "summary": {
+    "deviceCount": 2,
+    "belowTargetCount": 0,
+    "averageSliPercent": 99.9201,
+    "worstDevice": {
+      "deviceId": "device-001",
+      "impactUserMinutes": 53,
+      "sliPercent": 99.879,
+      "targetMet": true
+    }
+  },
+  "devices": [
+    {
+      "deviceId": "device-001",
+      "impactUserMinutes": 53,
+      "sliPercent": 99.879,
+      "targetMet": true
+    },
+    {
+      "deviceId": "device-009",
+      "impactUserMinutes": 17,
+      "sliPercent": 99.9612,
+      "targetMet": true
+    }
+  ]
+}

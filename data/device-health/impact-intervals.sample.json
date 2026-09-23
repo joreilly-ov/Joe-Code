@@ -1,0 +1,27 @@
+[
+  {
+    "deviceId": "device-001",
+    "hospital": "BJC",
+    "feature": "tv",
+    "errorCode": "TV_POWER",
+    "start": "2026-06-01T02:10:00Z",
+    "end": "2026-06-01T03:00:00Z",
+    "capMinutes": 60
+  },
+  {
+    "deviceId": "device-001",
+    "hospital": "BJC",
+    "feature": "wetv",
+    "errorCode": "P103",
+    "fixedImpactMinutes": 3,
+    "eventTime": "2026-06-05T13:22:00Z"
+  },
+  {
+    "deviceId": "device-009",
+    "hospital": "BJC",
+    "feature": "ibi",
+    "errorCode": "USB_DISCONNECT",
+    "start": "2026-06-13T08:00:00Z",
+    "end": "2026-06-13T08:17:00Z"
+  }
+]

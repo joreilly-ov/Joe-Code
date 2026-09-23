@@ -1,0 +1,23 @@
+{
+  "name": "ovcd-dashboard",
+  "version": "1.0.0",
+  "description": "OVCD customer build dashboard",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "scrape": "node src/scraper.js",
+    "dev": "node src/server.js",
+    "check": "node scripts/checks.js",
+    "check:syntax": "node --check src/server.js && node --check src/scraper.js",
+    "context:build": "node scripts/build-skill-context.js",
+    "context:build:sample": "node scripts/build-skill-context.js --input ./test file import --name sample-context",
+    "context:clean": "node scripts/clean-skill-context.js",
+    "context:build:clean": "npm run context:build && npm run context:clean",
+    "sli:calc": "node scripts/device-health/calc-sli.js",
+    "sli:calc:sample": "node scripts/device-health/calc-sli.js --input ./data/device-health/impact-intervals.sample.json --out ./data/device-health/sli-result.sample.json"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "playwright": "^1.44.0"
+  }
+}

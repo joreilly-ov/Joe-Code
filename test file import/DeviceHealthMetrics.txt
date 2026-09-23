@@ -1,0 +1,99 @@
+Device Health Metrics
+
+Device health metrics to provide an representation of the health of Oneview client apps & devices.
+
+•	User Level SLI 
+o	    SLI Exclusions
+o	    Measuring the SLI
+o	    Measuring the Impact on Users
+o	    Calculating the SLI
+o	    SLI Target
+•	External Dependency SLIs 
+o	    Measures
+•	Hospital Level SLO 
+o	    SLO Target
+
+•	Phasing
+•	Actions 
+o	From 2026-05-28
+•	Prior Work
+User Level SLI
+The User Service Level Indicator (SLI) is designed to measure the impact of system failures on users (patients/family members/clinicians) rather than the impact on the system itself (if a service crashed in the middle of the night, there is an impact on the system but there is possibly no impact on users.)
+Scenarios where we explicitly know that a user was impacted:
+•	user tries to open the TV guide but if fails to load and errors are logged
+•	meal ordering service crashes and meal ordering failures are logged
+Scenarios where its unclear if a user was impacted:
+•	if the LRC app is unavailable for a period of time, we don't know if a patient tried to use it or not, but we have to presume is had an impact
+•	if the device reboots unexpectedly
+The SLI implicitly covers:
+•	device resource capacity
+•	device OS health
+SLI Exclusions
+•	downtime caused by External Dependencies SLIs listed below
+•	planned downtime for system maintenance or upgrades
+
+Measuring the SLI
+The User SLI is measured monthly as:
+the % of time in a month where a user can successfully use application features or watch TV/movies using the tablet, AIO or STB (controlled via pillowspeaker/IR remote)
+
+Measuring the Impact on Users
+This requires the capture of app level failure events and reporting on the duration of impact on users.
+•	TV Power state error
+    o  	If it fails >10 times continuously over 5 mins, per device, trigger an alert
+    o	Remediation SOP: reinstall the LRC app
+    o	Impact on user: max 60 minutes
+•	TV listing file creation failure
+    o	If the TV listing failed to request fails, alert at 24 hours and 48 hours, after 36 hours the “No Info Available” will display to patients
+    o	Remediation SOP: multiple depending on cause
+    o	Impact on user: measure duration of “No Info Available” in minutes
+•	WeTV player error (BJC)
+    o	P101: player fails to initialise (needs 2026.R1.2 for reporting), configure alert on each error
+    o	Remediation SOP: clear WeTV player cache
+    o	Impact on user: max 60 minutes
+•	WeTV channel error (BJC)
+    o	P103: channel missing in config, configure alert when more than 3 error in 24 hours
+    o	Remediation SOP: customer is notified
+    o	Impact on user: not a sustained impact, record as 3 mins per instance
+•	IBI in non-working state (in 2026.R1.3 | BJC,Catholic)
+    o	USB device disconnect → USB device reconnected
+    o	Remediation SOP: restart device or reinstall LRC
+    o	Impact on user: USB device disconnect → USB device reconnected duration in minutes
+•	HTSP errors (BJC)
+    o	“User does not have access” errors
+    o	Remediation SOP: [CEP-16899] BJC WeTV errors - HTSP - user does not have access - is this related to tar file downloads? - JIRA
+    o	Impact on user: duration of the errors appearing in Datadog
+
+Calculating the SLI
+IU = the aggregate of the “Impact on user” for each device in minutes, per month
+Total minutes per month = 43800
+SLI = (43800 - IU) / 43800 * 100
+i.e. for a device with 60 minutes of impact the SLI is calculated as:
+(43800 - 60)/43800 * 100 = 99.86%
+SLI Target
+User SLI Target >= 99.7%
+
+________________________________________
+Phasing
+•	Phase 1 - EpicTV
+o	applies to 2026.R1.2
+o	Device uptime
+o	Wetek Admin App
+o	LRC App
+o	WeTV player
+o	API Gateway
+o	Hospital Service
+o	Live TV Service
+o	STS / Devices Hub
+•	Phase 2 - Cloud Enterprise
+o	all other features
+________________________________________
+Actions
+From 2026-05-28
+•	implement the alerts defined in the Measuring the Impact on Users section & deploy to Kingman- @David O'Bryan
+•	bring the metrics into PowerBI, aggregated and report on them - @Joe O'Reilly
+________________________________________
+Prior Work
+Device Health Datadog Metrics - Technical One-Pager - Greg Jackson - Confluence
+[CEP-12609] Device Health | Phase 1 | Discovery - JIRA
+[CEP-12812] Device Health | Phase 2 | PoC - JIRA
+[CEP-14309] Device Health | Phase 3 | Tooling Integration - JIRA

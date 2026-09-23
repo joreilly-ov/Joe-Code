@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OVCD Build Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #16213e;
+      color: white;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    header h1 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    #status-badge {
+      font-size: 0.78rem;
+      color: #a0aec0;
+    }
+
+    #scrape-btn {
+      background: #0f3460;
+      color: white;
+      border: 1px solid #e94560;
+      padding: 8px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      transition: background 0.2s;
+    }
+    #scrape-btn:hover { background: #e94560; }
+    #scrape-btn:disabled { background: #555; border-color: #555; cursor: not-allowed; }
+
+    .container { padding: 28px 32px; }
+
+    #toast {
+      display: none;
+      background: #276749;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+    #toast.error { background: #9b2335; }
+
+    .meta {
+      font-size: 0.82rem;
+      color: #718096;
+      margin-bottom: 20px;
+    }
+
+    /* Search / filter */
+    .filter-controls {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    #search-bar {
+      flex: 1;
+      min-width: 200px;
+      max-width: 380px;
+      padding: 9px 14px;
+      border: 1px solid #cbd5e0;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    #search-bar:focus { border-color: #0f3460; }
+
+    .status-filter {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: #4a5568;
+    }
+
+    .status-filter label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .status-filter input[type="radio"] {
+      cursor: pointer;
+    }
+
+    /* Table */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      font-size: 0.9rem;
+    }
+
+    thead th {
+      background: #16213e;
+      color: #e2e8f0;
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 500;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    thead th:first-child { border-radius: 10px 0 0 0; }
+    thead th:last-child  { border-radius: 0 10px 0 0; }
+
+    tbody tr:nth-child(odd)  { background: #fff; }
+    tbody tr:nth-child(even) { background: #f7fafc; }
+    tbody tr:hover           { background: #ebf4ff; }
+
+    tbody td {
+      padding: 11px 16px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: middle;
+    }
+
+    td.customer-name {
+      font-weight: 600;
+      color: #16213e;
+    }
+
+    .env-label {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-right: 6px;
+    }
+    .env-prod { background: #c6f6d5; color: #276749; }
+    .env-test { background: #bee3f8; color: #2b6cb0; }
+
+    .build-chip {
+      display: inline-block;
+      background: #edf2f7;
+      color: #4a5568;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-family: 'SF Mono', 'Consolas', monospace;
+    }
+    .build-chip.future { background: #fefcbf; color: #975a16; }
+
+    #empty-state {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+      color: #718096;
+    }
+    #empty-state h2 { font-size: 1.2rem; margin-bottom: 8px; }
+    #empty-state p  { font-size: 0.9rem; }
+    .country-group { margin-top: 32px; }
+    .group-heading {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #16213e;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>OVCD Build Dashboard</h1>
+  <div class="header-right">
+    <span id="status-badge">Loading...</span>
+    <button id="scrape-btn" onclick="triggerScrape()">&#8635; Refresh Data</button>
+  </div>
+</header>
+
+<div class="container">
+  <div id="toast"></div>
+
+  <div id="empty-state">
+    <h2>No data yet</h2>
+    <p>Click <strong>Refresh Data</strong> to scrape the OVCD dashboard.<br/>A browser window will open for you to log in.</p>
+  </div>
+
+  <div id="data-section" style="display:none">
+    <p class="meta" id="meta-text"></p>
+    <div class="filter-controls">
+      <input id="search-bar" type="text" placeholder="Filter by customer name..." oninput="applyFilters()" />
+      <div class="status-filter">
+        <span style="font-weight: 600; color: #2d3748;">Show:</span>
+        <label>
+          <input type="radio" name="status-filter" value="all" checked onchange="applyFilters()" /> All
+        </label>
+        <label>
+          <input type="radio" name="status-filter" value="hide-pre-term" onchange="applyFilters()" /> Hide Pre-Impl &amp; Term.
+        </label>
+      </div>
+    </div>
+    </div>
+
+    <div id="group-usa" class="country-group">
+      <h2 class="group-heading">🇺🇸 USA</h2>
+      <div class="table-wrap">
+        <table class="builds-table">
+          <thead><tr>
+            <th>Customer</th>
+            <th><span class="env-label env-prod">Prod</span> Current Build</th>
+            <th><span class="env-label env-test">Test</span> Current Build</th>
+            <th>Delivery</th>
+            <th>Status</th>
+          </tr></thead>
+          <tbody id="tbody-usa"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="group-row" class="country-group">
+      <h2 class="group-heading">🌏 Rest of World</h2>
+      <div class="table-wrap">
+        <table class="builds-table">
+          <thead><tr>
+            <th>Customer</th>
+            <th><span class="env-label env-prod">Prod</span> Current Build</th>
+            <th><span class="env-label env-test">Test</span> Current Build</th>
+            <th>Delivery</th>
+            <th>Status</th>
+          </tr></thead>
+          <tbody id="tbody-row"></tbody>
+        </table>
+      </div>
+    </div>
+</div>
+
+<script>
+  let allCustomers = [];
+
+  async function loadData() {
+    try {
+      const res = await fetch('/api/status');
+      const status = await res.json();
+
+      if (!status.hasData) {
+        document.getElementById('empty-state').style.display = 'block';
+        document.getElementById('status-badge').textContent = 'No data yet';
+        return;
+      }
+
+      const dataRes = await fetch('/api/data');
+      const data = await dataRes.json();
+      allCustomers = data.customers || [];
+
+      const age = status.ageMinutes;
+      const ageStr = age < 60 ? `${age}m ago` : `${Math.round(age/60)}h ago`;
+      const extracted = new Date(data.extractedAt).toLocaleString();
+      document.getElementById('meta-text').textContent =
+        `${allCustomers.length} customers · Last updated ${extracted} (${ageStr})`;
+      document.getElementById('status-badge').textContent = `Updated ${ageStr}`;
+
+      renderTable(allCustomers);
+
+      document.getElementById('empty-state').style.display = 'none';
+      document.getElementById('data-section').style.display = 'block';
+    } catch (err) {
+      showToast('Failed to load data: ' + err.message, true);
+    }
+  }
+
+  function renderTable(customers) {
+    function rowHtml(c) {
+      const status = c.status || '';
+      const s = status.toLowerCase();
+      const sc = s.includes('live') ? '#276749' : s.includes('pre') ? '#975a16' : s.includes('terminated') ? '#9b2c2c' : '#2d3748';
+      const sb = s.includes('live') ? '#c6f6d5' : s.includes('pre') ? '#fefcbf' : s.includes('terminated') ? '#fed7d7' : '#e2e8f0';
+      return '<tr>' +
+        '<td class="customer-name">' + esc(c.name) + '</td>' +
+        '<td><span class="build-chip">' + (esc(c.prodCurrentBuild) || '\u2013') + '</span></td>' +
+        '<td><span class="build-chip">' + (esc(c.testCurrentBuild) || '\u2013') + '</span></td>' +
+        '<td><span class="build-chip">' + (esc(c.deliveryType) || '\u2013') + '</span></td>' +
+        '<td><span class="build-chip" style="background-color:' + sb + ';color:' + sc + ';">' + (esc(status) || '\u2013') + '</span></td>' +
+        '</tr>';
+    }
+    function makeRows(list) {
+      return list.length ? list.map(rowHtml).join('') : '<tr><td colspan="5" style="text-align:center;padding:20px;color:#718096">No customers.</td></tr>';
+    }
+    const usa = customers.filter(c => /united states|united states of america|^u\.?s\.?a\.?$|^u\.?s\.?$/i.test((c.country || '').trim()));
+    const row = customers.filter(c => !usa.includes(c));
+    document.getElementById('tbody-usa').innerHTML = makeRows(usa);
+    document.getElementById('tbody-row').innerHTML = makeRows(row);
+    document.getElementById('group-usa').style.display = usa.length ? '' : 'none';
+    document.getElementById('group-row').style.display = row.length ? '' : 'none';
+  }
+  function applyFilters() {
+    const searchQuery = document.getElementById('search-bar').value.toLowerCase();
+    const statusFilter = document.querySelector('input[name="status-filter"]:checked').value;
+
+    let filtered = allCustomers.filter(c => 
+      c.name.toLowerCase().includes(searchQuery)
+    );
+
+    if (statusFilter === 'hide-pre-term') {
+      filtered = filtered.filter(c => {
+        const status = (c.status || '').toLowerCase();
+        return !status.includes('pre-implementation') && !status.includes('terminated');
+      });
+    }
+
+    renderTable(filtered);
+  }
+
+  async function triggerScrape() {
+    const btn = document.getElementById('scrape-btn');
+    btn.disabled = true;
+    btn.textContent = 'Scraping...';
+    showToast('Scrape started — a browser window will open. Log in to OVCD, then wait for it to close automatically.');
+
+    try {
+      await fetch('/api/scrape', { method: 'POST' });
+
+      // Poll for fresh data every 5s for up to 5 minutes
+      let attempts = 0;
+      const poll = setInterval(async () => {
+        attempts++;
+        const status = await (await fetch('/api/status')).json();
+        const age = status.ageMinutes;
+        if (age !== null && age < 2) {
+          clearInterval(poll);
+          showToast('Data updated successfully!');
+          await loadData();
+          btn.disabled = false;
+          btn.textContent = '⟳ Refresh Data';
+        }
+        if (attempts > 60) {
+          clearInterval(poll);
+          btn.disabled = false;
+          btn.textContent = '⟳ Refresh Data';
+          showToast('Timed out waiting for scrape. Check the terminal.', true);
+        }
+      }, 5000);
+    } catch (err) {
+      showToast('Failed to start scrape: ' + err.message, true);
+      btn.disabled = false;
+      btn.textContent = '⟳ Refresh Data';
+    }
+  }
+
+  function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = isError ? 'error' : '';
+    t.style.display = 'block';
+    if (!isError) setTimeout(() => t.style.display = 'none', 6000);
+  }
+
+  function esc(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  loadData();
+</script>
+</body>
+</html>
