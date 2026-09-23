@@ -212,7 +212,10 @@ function parseEnvironmentDetails(text) {
     testDate: test?.[2] || '',
     tabletsCount: count('Tablets Count'),
     stbCount: count('STB Count'),
-    tvCount: count('TV Count')
+    tvCount: count('TV Count'),
+    aioCount: count('AIO Count'),
+    ddsCount: count('DDS Count'),
+    dwbDeviceCount: count('DWB Device Count')
   };
 }
 

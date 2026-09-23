@@ -49,7 +49,7 @@ function render(result) {
   if (!clientList.length) {
     const row = document.createElement('tr');
     row.className = 'empty';
-    row.innerHTML = '<td colspan="8">No Live clients detected.</td>';
+    row.innerHTML = '<td colspan="11">No Live clients detected.</td>';
     clients.append(row);
   }
   for (const client of clientList) {
@@ -62,7 +62,10 @@ function render(result) {
       client.testDate,
       client.tabletsCount,
       client.stbCount,
-      client.tvCount
+      client.tvCount,
+      client.aioCount,
+      client.ddsCount,
+      client.dwbDeviceCount
     ]) {
       const cell = document.createElement('td');
       cell.textContent = value || '—';
