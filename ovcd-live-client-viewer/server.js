@@ -203,12 +203,16 @@ function parseEnvironmentDetails(text) {
   const normalized = text.replace(/\s+/g, ' ').trim();
   const production = normalized.match(/PROD Environment.*?Prod Version Number\s+([^\s]+).*?Last Installed\/Upgraded Date\s+([^\s]+)/i);
   const test = normalized.match(/TEST Environment.*?TEST Version Number\s+([^\s]+).*?Last Installed\/Upgraded Date\s+([^\s]+)/i);
+  const count = (label) => normalized.match(new RegExp(`${label}\\s*[:#-]?\\s*(\\d+)`, 'i'))?.[1] || '';
 
   return {
     productionVersion: production?.[1] || '',
     productionDate: production?.[2] || '',
     testVersion: test?.[1] || '',
-    testDate: test?.[2] || ''
+    testDate: test?.[2] || '',
+    tabletsCount: count('Tablets Count'),
+    stbCount: count('STB Count'),
+    tvCount: count('TV Count')
   };
 }
 

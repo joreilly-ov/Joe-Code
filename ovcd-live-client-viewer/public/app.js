@@ -49,12 +49,21 @@ function render(result) {
   if (!clientList.length) {
     const row = document.createElement('tr');
     row.className = 'empty';
-    row.innerHTML = '<td colspan="5">No Live clients detected.</td>';
+    row.innerHTML = '<td colspan="8">No Live clients detected.</td>';
     clients.append(row);
   }
   for (const client of clientList) {
     const row = document.createElement('tr');
-    for (const value of [client.name, client.productionVersion, client.productionDate, client.testVersion, client.testDate]) {
+    for (const value of [
+      client.name,
+      client.productionVersion,
+      client.productionDate,
+      client.testVersion,
+      client.testDate,
+      client.tabletsCount,
+      client.stbCount,
+      client.tvCount
+    ]) {
       const cell = document.createElement('td');
       cell.textContent = value || '—';
       row.append(cell);
