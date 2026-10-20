@@ -219,8 +219,8 @@ function parseEnvironmentDetails(text) {
   };
 }
 
-app.listen(port, () => {
-  console.log(`OVCD Live Client Viewer running at http://localhost:${port}`);
+app.listen(port, '127.0.0.1', () => {
+  console.log(`OVCD Live Client Viewer running at http://127.0.0.1:${port}`);
 });
 
 process.on('SIGINT', async () => {

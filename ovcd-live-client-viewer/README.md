@@ -11,7 +11,7 @@ npx playwright install chromium
 npm start
 ```
 
-Open `http://localhost:4177` and choose **Refresh data**. A visible Chromium window opens using the local `.playwright-profile` folder. Complete SSO there if prompted, then press **Refresh data** again; the session is retained for later refreshes.
+Open `http://127.0.0.1:4177` and choose **Refresh data**. A visible Chromium window opens using the local `.playwright-profile` folder. Complete SSO there if prompted, then press **Refresh data** again; the session is retained for later refreshes.
 
 The normal Edge profile is intentionally not modified or read. The viewer keeps its own Playwright session and saves the latest successful client result to the ignored `data/last-good-state.json` file. When the app starts, that snapshot is shown until a newer refresh succeeds.
 

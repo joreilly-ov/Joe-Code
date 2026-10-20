@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^node -e \"const \\{ chromium \\} = require\\('playwright'\\); \\(async \\(\\) => \\{ const browser = await chromium\\.launch\\(\\{ headless: true \\}\\); try \\{ const page = await browser\\.newPage\\(\\); await page\\.goto\\('file:///C:/Users/joreilly/Joe-Working-Space/public/index\\.html'\\); const result = await page\\.evaluate\\(\\(\\) => \\(\\{ usaInside: document\\.querySelector\\('#data-section'\\)\\.contains\\(document\\.querySelector\\('#group-usa'\\)\\), restInside: document\\.querySelector\\('#data-section'\\)\\.contains\\(document\\.querySelector\\('#group-row'\\)\\), sectionDisplay: getComputedStyle\\(document\\.querySelector\\('#data-section'\\)\\)\\.display \\}\\)\\); console\\.log\\(JSON\\.stringify\\(result\\)\\); if \\(!result\\.usaInside \\|\\| !result\\.restInside \\|\\| result\\.sectionDisplay !== 'none'\\) process\\.exitCode = 1; \\} finally \\{ await browser\\.close\\(\\); \\} \\}\\)\\(\\)\\.catch\\(error => \\{ console\\.error\\(error\\); process\\.exitCode = 1; \\}\\);\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

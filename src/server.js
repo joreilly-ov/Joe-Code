@@ -50,11 +50,11 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '127.0.0.1', () => {
   console.log('');
   console.log('==============================================');
   console.log(`  OVCD Dashboard running at:`);
-  console.log(`  http://localhost:${PORT}`);
+  console.log(`  http://127.0.0.1:${PORT}`);
   console.log('==============================================');
   console.log('');
 });

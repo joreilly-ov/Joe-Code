@@ -10,7 +10,7 @@ npx playwright install chromium
 npm start
 ```
 
-Then open http://localhost:3000 and click Refresh Data.
+Then open http://127.0.0.1:3000 and click Refresh Data.
 
 A browser window will open, log in to OVCD manually, then the scraper continues automatically.
 
