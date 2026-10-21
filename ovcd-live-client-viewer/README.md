@@ -18,3 +18,13 @@ The normal Edge profile is intentionally not modified or read. The viewer keeps 
 Each refresh loads the Live client list with the page size set to 100, then visits each client's detail page to collect PROD and TEST version numbers plus their last installed/upgraded dates. Refreshing is sequential and may take a few minutes for the full client list. The **Fetch diagnostics** section shows crawl counts and sample source rows when the site markup needs a selector adjustment.
 
 If the browser is already authenticated, the refresh runs unattended. If SSO is required, complete sign-in in the visible Playwright window and press **Refresh data** again. TEST values are only available when the corresponding detail page exposes them; missing values remain blank.
+
+## Filters
+
+A filter bar above the table narrows the list in the browser; no refresh is needed and filters combine (AND):
+
+- **Client name**, **Prod version**, **Test version**: case-insensitive "contains" text matches (for example `4.2` matches any version containing 4.2).
+- **Has tablets / STBs / TVs / AIOs / DDS / DWB devices**: hides clients whose count is blank or zero.
+- **Clear** resets all filters. A counter shows how many clients match (for example `12 of 40`).
+
+Filters stay applied after **Refresh data**.
