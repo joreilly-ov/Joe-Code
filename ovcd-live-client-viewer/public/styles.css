@@ -25,6 +25,10 @@ h1 { margin: 0; font-size: clamp(38px, 5vw, 74px); line-height: .98; font-weight
 .refresh { border: 0; border-radius: 4px; background: var(--accent); color: white; padding: 14px 20px; font: 700 14px Arial, sans-serif; cursor: pointer; white-space: nowrap; }
 .refresh:hover { background: var(--accent-dark); }
 .refresh:disabled { opacity: .55; cursor: wait; }
+.filters { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 13px 0; font: 13px Arial, sans-serif; }
+.filters input[type="search"] { padding: 6px 8px; border: 1px solid var(--line); min-width: 160px; }
+.filters label { display: flex; align-items: center; gap: 4px; }
+#f-count { margin-left: auto; color: var(--muted); }
 .status-bar { display: flex; justify-content: space-between; gap: 20px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 13px 0; color: var(--muted); font: 12px Arial, sans-serif; }
 .message { margin: 20px 0; padding: 16px; border-left: 4px solid var(--accent); background: #fff2ed; font: 14px/1.4 Arial, sans-serif; }
 .table-wrap { overflow-x: auto; margin-top: 28px; background: var(--panel); border: 1px solid var(--line); }

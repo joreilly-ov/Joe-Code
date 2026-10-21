@@ -24,6 +24,16 @@
 
       <section id="message" class="message" hidden></section>
 
+      <section class="filters" aria-label="Filters">
+        <input id="f-client" type="search" placeholder="Client name">
+        <input id="f-prod" type="search" placeholder="Prod version (e.g. 4.2)">
+        <input id="f-test" type="search" placeholder="Test version">
+        <label><input id="f-tablets" type="checkbox"> Has tablets</label>
+        <label><input id="f-stb" type="checkbox"> Has STBs</label>
+        <button id="f-clear" type="button">Clear</button>
+        <span id="f-count"></span>
+      </section>
+
       <section class="table-wrap" aria-label="Live clients">
         <table>
           <thead>

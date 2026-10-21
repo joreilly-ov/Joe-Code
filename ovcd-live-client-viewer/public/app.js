@@ -5,6 +5,33 @@ const message = document.querySelector('#message');
 const clients = document.querySelector('#clients');
 const diagnostics = document.querySelector('#diagnostics');
 
+let lastResult = { clients: [] };
+const filterInputs = ['#f-client', '#f-prod', '#f-test', '#f-tablets', '#f-stb'].map((s) => document.querySelector(s));
+const [fClient, fProd, fTest, fTablets, fStb] = filterInputs;
+const fCount = document.querySelector('#f-count');
+for (const input of filterInputs) input.addEventListener('input', () => render(lastResult));
+document.querySelector('#f-clear').addEventListener('click', () => {
+  for (const input of filterInputs) {
+    if (input.type === 'checkbox') input.checked = false;
+    else input.value = '';
+  }
+  render(lastResult);
+});
+
+function hasCount(value) {
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0;
+}
+
+function matches(client) {
+  const has = (field, term) => !term.trim() || String(field || '').toLowerCase().includes(term.trim().toLowerCase());
+  return has(client.name, fClient.value)
+    && has(client.productionVersion, fProd.value)
+    && has(client.testVersion, fTest.value)
+    && (!fTablets.checked || hasCount(client.tabletsCount))
+    && (!fStb.checked || hasCount(client.stbCount));
+}
+
 refreshButton.addEventListener('click', refresh);
 loadLastState();
 
@@ -44,12 +71,15 @@ async function refresh() {
 }
 
 function render(result) {
-  const clientList = Array.isArray(result.clients) ? result.clients : [];
+  lastResult = result;
+  const allClients = Array.isArray(result.clients) ? result.clients : [];
+  const clientList = allClients.filter(matches);
+  fCount.textContent = `${clientList.length} of ${allClients.length}`;
   clients.replaceChildren();
   if (!clientList.length) {
     const row = document.createElement('tr');
     row.className = 'empty';
-    row.innerHTML = '<td colspan="11">No Live clients detected.</td>';
+    row.innerHTML = `<td colspan="11">${allClients.length ? 'No clients match the filters.' : 'No Live clients detected.'}</td>`;
     clients.append(row);
   }
   for (const client of clientList) {
