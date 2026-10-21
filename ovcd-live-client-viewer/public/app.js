@@ -6,8 +6,8 @@ const clients = document.querySelector('#clients');
 const diagnostics = document.querySelector('#diagnostics');
 
 let lastResult = { clients: [] };
-const filterInputs = ['#f-client', '#f-prod', '#f-test', '#f-tablets', '#f-stb'].map((s) => document.querySelector(s));
-const [fClient, fProd, fTest, fTablets, fStb] = filterInputs;
+const filterInputs = ['#f-client', '#f-prod', '#f-test', '#f-tablets', '#f-stb', '#f-tv', '#f-aio', '#f-dds', '#f-dwb'].map((s) => document.querySelector(s));
+const [fClient, fProd, fTest, fTablets, fStb, fTv, fAio, fDds, fDwb] = filterInputs;
 const fCount = document.querySelector('#f-count');
 for (const input of filterInputs) input.addEventListener('input', () => render(lastResult));
 document.querySelector('#f-clear').addEventListener('click', () => {
@@ -29,7 +29,11 @@ function matches(client) {
     && has(client.productionVersion, fProd.value)
     && has(client.testVersion, fTest.value)
     && (!fTablets.checked || hasCount(client.tabletsCount))
-    && (!fStb.checked || hasCount(client.stbCount));
+    && (!fStb.checked || hasCount(client.stbCount))
+    && (!fTv.checked || hasCount(client.tvCount))
+    && (!fAio.checked || hasCount(client.aioCount))
+    && (!fDds.checked || hasCount(client.ddsCount))
+    && (!fDwb.checked || hasCount(client.dwbDeviceCount));
 }
 
 refreshButton.addEventListener('click', refresh);
