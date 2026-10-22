@@ -45,7 +45,10 @@ async function loadLastState() {
     const result = await response.json();
     if (result.clients?.length) {
       render(result);
-      state.textContent = 'Showing the last good snapshot';
+      const when = new Date(result.snapshotSavedAt || result.fetchedAt).toLocaleString();
+      state.textContent = `Saved data from ${when}`;
+      message.textContent = `Showing saved data from ${when}, not live. Press Refresh data to update.`;
+      message.hidden = false;
     }
   } catch (_error) {
   }
