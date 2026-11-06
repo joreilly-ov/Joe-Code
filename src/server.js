@@ -6,6 +6,10 @@ const { scrape } = require('./scraper');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, '..', 'data', 'builds.json');
+const VIEWER_URL = process.env.VIEWER_URL || 'http://127.0.0.1:4177';
+
+// Superseded by ovcd-live-client-viewer
+app.get('/', (req, res) => res.redirect(VIEWER_URL));
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
