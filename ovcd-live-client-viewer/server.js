@@ -54,6 +54,7 @@ app.post('/api/refresh', async (_request, response) => {
 async function getContext() {
   if (!browserContext) {
     browserContext = await chromium.launchPersistentContext(profileDir, {
+      channel: 'msedge',
       headless: false,
       viewport: { width: 1440, height: 1000 },
       acceptDownloads: false
